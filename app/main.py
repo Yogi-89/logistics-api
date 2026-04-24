@@ -5,16 +5,22 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from app.database import engine, Base
 from app.routers import auth, apikey, logistics, billing, profile, telegram_bot
+from app.utils.limiter import limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
-# Initialize Database
-# Note: In production, use Alembic. For UTS, this is convenient.
-Base.metadata.create_all(bind=engine)
+# Note: In production and scale-up, we use Alembic for migrations.
+# To update DB, run: alembic upgrade head
 
 app = FastAPI(
     title="Logistics Rate & Tracking API",
     description="API for checking shipping rates and tracking packages (UTS Semester 6)",
     version="1.0.0"
 )
+
+# Rate Limiter Configuration
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS Configuration
 app.add_middleware(

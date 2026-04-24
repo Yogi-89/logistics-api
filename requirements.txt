@@ -11,3 +11,7 @@ python-jose[cryptography]
 python-dotenv
 email-validator
 fpdf2
+alembic
+redis
+slowapi
+httpx

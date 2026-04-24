@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Path, Response, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.database import get_db
 from app.models import base as models
 from app.schemas import schemas
@@ -9,78 +9,171 @@ from app.utils.api_key_auth import validate_api_key
 import io
 from fpdf import FPDF
 
+from app.utils.limiter import limiter
+import random
+import string
+from datetime import datetime
+import os
+import httpx
+
 router = APIRouter(prefix="/v1", tags=["Logistics Data (Needs API Key)"])
 
-@router.get("/couriers", response_model=List[schemas.Courier], summary="Daftar Kurir", description="Mengambil daftar mitra kurir logistik yang tersedia (JNE, J&T, SiCepat, dll) lengkap dengan Logo dan Deskripsi layanan.")
-def get_couriers(response: Response, db: Session = Depends(get_db), api_key=Depends(validate_api_key)):
+@router.get("/couriers", response_model=List[schemas.Courier], summary="Daftar Kurir")
+@limiter.limit("60/minute")
+def get_couriers(request: Request, db: Session = Depends(get_db), api_key=Depends(validate_api_key)):
     user = api_key.owner
-    response.headers["X-RateLimit-Limit"] = str(user.quota_limit)
-    response.headers["X-RateLimit-Remaining"] = str(user.quota_limit - user.quota_used)
-    response.headers["X-RateLimit-Used"] = str(user.quota_used)
-    
     return db.query(models.Courier).all()
 
-@router.get("/cities", response_model=List[schemas.City], summary="Daftar Kota operasional", description="Mengambil data wilayah kiriman di Indonesia yang didukung oleh sistem, termasuk Tipe (Kota/Kabupaten) dan Kode Pos.")
-def get_cities(response: Response, db: Session = Depends(get_db), api_key=Depends(validate_api_key)):
-    user = api_key.owner
-    response.headers["X-RateLimit-Limit"] = str(user.quota_limit)
-    response.headers["X-RateLimit-Remaining"] = str(user.quota_limit - user.quota_used)
-    
+@router.get("/cities", response_model=List[schemas.City], summary="Daftar Kota")
+@limiter.limit("60/minute")
+def get_cities(request: Request, db: Session = Depends(get_db), api_key=Depends(validate_api_key)):
     return db.query(models.City).all()
 
-@router.get("/cost", summary="Kalkulasi Ongkos Kirim", description="Menghitung estimasi biaya pengiriman antar kota berdasarkan berat paket dan pilihan kurir. Mengembalikan berbagai jenis layanan (REG, OKE, YES) beserta estimasi waktu sampai (ETD).")
-def calculate_cost(
+@router.get("/cities/{city_id}/subdistricts", summary="Daftar Kecamatan")
+@limiter.limit("60/minute")
+def get_subdistricts(city_id: int, request: Request, db: Session = Depends(get_db), api_key=Depends(validate_api_key)):
+    return db.query(models.Subdistrict).filter(models.Subdistrict.city_id == city_id).all()
+
+@router.post("/cost", summary="Kalkulasi Ongkos Kirim (Scale-up)")
+@limiter.limit("30/minute")
+async def calculate_cost(
+    request: Request,
+    payload: schemas.CostRequest,
     response: Response,
-    origin_id: int = Query(..., description="ID Kota Asal (lihat /v1/cities)", examples=[6]),
-    destination_id: int = Query(..., description="ID Kota Tujuan (lihat /v1/cities)", examples=[7]),
-    weight_gram: int = Query(1000, description="Berat paket dalam gram (default 1000g)", examples=[1000]),
-    courier_code: str = Query(..., description="Kode kurir (jne, jnt, sicepat, pos, anteraja)", examples=["jne"]),
     db: Session = Depends(get_db),
     api_key=Depends(validate_api_key)
 ):
-    user = api_key.owner
-    response.headers["X-RateLimit-Limit"] = str(user.quota_limit)
-    response.headers["X-RateLimit-Remaining"] = str(user.quota_limit - user.quota_used)
     # Logic: Validate cities
-    origin = db.query(models.City).filter(models.City.id == origin_id).first()
-    destination = db.query(models.City).filter(models.City.id == destination_id).first()
+    origin = db.query(models.City).filter(models.City.id == payload.origin).first()
+    destination = db.query(models.City).filter(models.City.id == payload.destination).first()
     
     if not origin or not destination:
         raise HTTPException(status_code=404, detail="Origin or Destination city not found")
 
-    courier = db.query(models.Courier).filter(models.Courier.code == courier_code).first()
+    courier = db.query(models.Courier).filter(models.Courier.code == payload.courier).first()
     if not courier:
         raise HTTPException(status_code=404, detail="Courier not found")
     
-    # Simple logic for UTS: Generate multiple services based on courier
-    services = []
-    base_price = 10000 + (len(courier.name) * 100) # Arbitrary base
-    weight_kg = weight_gram / 1000
+    # Volumetric Logic: (P x L x T) / 6000
+    volumetric_weight = 0
+    if payload.length and payload.width and payload.height:
+        volumetric_weight = (payload.length * payload.width * payload.height) / 6000 * 1000 # convert to gram
     
-    if courier.code == "jne":
-        services = [
-            {"service": "REG", "description": "Reguler", "cost": int(base_price * weight_kg), "etd": "2-3 Days"},
-            {"service": "YES", "description": "Yakin Esok Sampai", "cost": int(base_price * 1.5 * weight_kg), "etd": "1 Day"},
-            {"service": "OKE", "description": "Ongkos Kirim Ekonomis", "cost": int(base_price * 0.8 * weight_kg), "etd": "4-5 Days"}
-        ]
-    elif courier.code == "jnt":
-        services = [
-            {"service": "EZ", "description": "Regular Service", "cost": int(base_price * 0.95 * weight_kg), "etd": "2-3 Days"},
-            {"service": "ECO", "description": "Economy Service", "cost": int(base_price * 0.7 * weight_kg), "etd": "5-7 Days"}
-        ]
-    else:
-        services = [
-            {"service": "REG", "description": "Regular Service", "cost": int(base_price * weight_kg), "etd": "3-4 Days"},
-            {"service": "EXP", "description": "Express Service", "cost": int(base_price * 1.4 * weight_kg), "etd": "1-2 Days"}
+    effective_weight = max(payload.weight, volumetric_weight)
+    
+    # Scale-up: Real Raja Ongkir Integration
+    rajaongkir_key = os.getenv("RAJA_ONGKIR_API_KEY")
+    results = []
+    
+    if rajaongkir_key and rajaongkir_key != "your_raja_ongkir_key_here":
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(
+                    "https://api.rajaongkir.com/starter/cost",
+                    headers={"key": rajaongkir_key},
+                    data={
+                        "origin": str(payload.origin),
+                        "destination": str(payload.destination),
+                        "weight": int(effective_weight),
+                        "courier": payload.courier.lower()
+                    },
+                    timeout=5.0
+                )
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    raja_results = data.get("rajaongkir", {}).get("results", [])
+                    for r in raja_results:
+                        for s in r.get("costs", []):
+                            results.append({
+                                "service": s.get("service"),
+                                "description": s.get("description"),
+                                "cost": s.get("cost", [{}])[0].get("value", 0),
+                                "etd": s.get("cost", [{}])[0].get("etd", "N/A"),
+                                "source": "rajaongkir"
+                            })
+        except Exception:
+            pass
+
+    if not results:
+        # Fallback Logic (Dummy calculation if API fails or no key)
+        weight_kg = effective_weight / 1000
+        base_price = 12000 + (len(origin.name) * 100)
+        results = [
+            {"service": "REG", "description": "Reguler Service", "cost": int(base_price * weight_kg), "etd": "2-3 Days", "source": "internal_fallback"},
+            {"service": "EXP", "description": "Express Service", "cost": int(base_price * 1.5 * weight_kg), "etd": "1 Day", "source": "internal_fallback"}
         ]
     
     return {
         "origin": origin.name,
         "destination": destination.name,
         "courier": courier.name,
-        "weight": weight_gram,
-        "results": services,
+        "actual_weight": payload.weight,
+        "volumetric_weight": int(volumetric_weight),
+        "effective_weight": int(effective_weight),
+        "results": results,
         "currency": "IDR"
+    }
+
+@router.post("/shipments", summary="Generate AWB (Waybill)")
+@limiter.limit("10/minute")
+def create_shipment(
+    request: Request,
+    payload: schemas.ShipmentCreate,
+    db: Session = Depends(get_db),
+    api_key=Depends(validate_api_key)
+):
+    # Generate AWB
+    random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    awb = f"SS-{payload.service_type}-{random_str}"
+    
+    # Calculate Cost (re-verify)
+    base_price = 12000
+    effective_weight = payload.weight_gram
+    if payload.length_cm and payload.width_cm and payload.height_cm:
+        volumetric = (payload.length_cm * payload.width_cm * payload.height_cm) / 6000 * 1000
+        effective_weight = max(payload.weight_gram, volumetric)
+    
+    shipping_cost = (effective_weight / 1000) * base_price
+    
+    new_tracking = models.Tracking(
+        awb=awb,
+        courier_id=payload.courier_id,
+        status="MANIFESTED",
+        origin_city_id=payload.origin_city_id,
+        destination_city_id=payload.destination_city_id,
+        service_type=payload.service_type,
+        weight_gram=payload.weight_gram,
+        length_cm=payload.length_cm,
+        width_cm=payload.width_cm,
+        height_cm=payload.height_cm,
+        insurance_value=payload.insurance_value,
+        shipping_cost=shipping_cost,
+        sender_name=payload.sender_name,
+        sender_phone=payload.sender_phone,
+        sender_address=payload.sender_address,
+        sender_postal_code=payload.sender_postal_code,
+        receiver_name=payload.receiver_name,
+        receiver_phone=payload.receiver_phone,
+        receiver_address=payload.receiver_address,
+        receiver_postal_code=payload.receiver_postal_code,
+        history=[{
+            "status": "MANIFESTED",
+            "location": "Origin Warehouse",
+            "timestamp": datetime.utcnow().isoformat(),
+            "note": "Package is being prepared for shipment"
+        }]
+    )
+    
+    db.add(new_tracking)
+    db.commit()
+    db.refresh(new_tracking)
+    
+    return {
+        "status": "success",
+        "awb": awb,
+        "shipping_cost": shipping_cost,
+        "etd": "2-3 Days"
     }
 
 
@@ -104,8 +197,44 @@ def track_package(
         "awb": track.awb,
         "courier": courier.name if courier else "Unknown",
         "status": track.status,
+        "service_type": track.service_type,
+        "weight_gram": track.weight_gram,
+        "shipping_cost": track.shipping_cost,
+        "sender_name": track.sender_name,
+        "receiver_name": track.receiver_name,
+        "receiver_address": track.receiver_address,
         "history": track.history
     }
+
+@router.post("/tracking/{awb}/update", summary="Update Status Tracking")
+@limiter.limit("20/minute")
+def update_tracking_status(
+    request: Request,
+    awb: str,
+    status: str,
+    location: str,
+    note: Optional[str] = None,
+    db: Session = Depends(get_db),
+    api_key=Depends(validate_api_key)
+):
+    track = db.query(models.Tracking).filter(models.Tracking.awb == awb).first()
+    if not track:
+        raise HTTPException(status_code=404, detail="Tracking number (AWB) not found")
+    
+    new_history = list(track.history)
+    new_history.append({
+        "status": status,
+        "location": location,
+        "timestamp": datetime.utcnow().isoformat(),
+        "note": note
+    })
+    
+    track.status = status
+    track.history = new_history
+    track.last_updated = datetime.utcnow()
+    
+    db.commit()
+    return {"status": "success", "current_status": status}
 
 @router.get("/label/{awb}", summary="Generate Shipping Label (PDF)", description="Menghasilkan label pengiriman (Shipping Label) standar industri dalam format PDF untuk dicetak.")
 def get_shipping_label(

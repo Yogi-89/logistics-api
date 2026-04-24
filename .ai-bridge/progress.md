@@ -1,5 +1,5 @@
 # 📊 PROGRESS — ShipStream Logistics API
-> Status per: 2026-04-23 | Dikompilasi dari PROGRESS.md + ISSUES.md
+> Status per: 2026-04-25 | Dikompilasi dari PROGRESS.md + ISSUES.md
 
 ---
 
@@ -14,8 +14,10 @@
 - [x] Auth: Register, Login (JWT + Session Tracking), Verify Code, Resend OTP
 - [x] Auth: Debug endpoint OTP (`DEBUG_MODE` protected)
 - [x] API Key: Generate, List, Update Settings (label, limit, IP whitelist), Revoke
-- [x] Logistics: List Couriers, List Cities, Hitung Ongkir, Track AWB, Generate PDF Label
-- [x] Logistics: Rate-limit headers (`X-RateLimit-*`) di semua endpoint
+- [x] Logistics: List Couriers, List Cities, List Subdistricts (NEW)
+- [x] Logistics: Hitung Ongkir (Raja Ongkir Integration), Track AWB, Generate PDF Label
+- [x] Logistics: Volumetric Weight calculation logic
+- [x] Logistics: Rate-limit headers & Redis-backed Rate Limiting (NEW)
 - [x] Billing: Create Topup (pending invoice), History, Cancel Order
 - [x] Billing: Crypto Auto-Verify via BaseScan API (Base chain + Plasma chain)
 - [x] Billing: Toleransi ±0.05 USD, fallback RPC jika explorer API gagal
@@ -50,7 +52,9 @@
 - [x] Postman Collection tersedia di `postman/collection.json`
 - [x] Backup DB tersedia di `backups/`
 - [x] Seed scripts: `seed_cities.py`, `app/utils/seed_data.py`
-- [x] Migration scripts di `app/utils/` dan root
+- [x] Database Migration: Alembic environment setup & Initial migrations
+- [x] CI/CD: GitHub Actions for linting and pytest
+- [x] Testing: Integration tests for logistics validation (8 test, 0 fail) [UPDATED 2026-04-25]
 
 ---
 
@@ -61,7 +65,7 @@
 | Midtrans | Simulasi saja, tidak terhubung ke gateway asli |
 | Email OTP | Menggunakan Resend.com (`re_Zckt2kfw...`) — perlu verifikasi domain untuk produksi |
 | Exchange Rate | CoinGecko free tier, bisa rate-limited; fallback hardcoded 16000 |
-| Shipping Cost | Kalkulasi ongkir adalah simulasi berbasis formula arbitrary (bukan API Raja Ongkir) |
+| Shipping Cost | Integrated with Raja Ongkir (Starter Plan) + Volumetric Fallback |
 | Tracking | Data tracking adalah seed/dummy, bukan real-time dari kurir |
 
 ---
@@ -70,6 +74,9 @@
 
 | Tanggal | Bug | File |
 |---------|-----|------|
+| 2026-04-25 | SlowAPI RedisConnectionError di pytest (no live Redis) | tests/conftest.py (baru: patch memory storage) |
+| 2026-04-24 | `Optional` NameError in tracking update | logistics.py |
+| 2026-04-24 | Weak schema validation in logistics | schemas.py |
 | 2026-04-23 | Settings tab mobile masih 2 kolom | style.css |
 | 2026-04-23 | Security Health card tidak simetris | dashboard.html, style.css |
 | 2026-04-23 | Playground dropdown reset saat pindah tab | dashboard.html |
@@ -88,7 +95,31 @@
 
 ## 🔮 Hal Yang Mungkin Dikerjakan Selanjutnya (Jika Ada)
 - [ ] Dokumentasi PDF resmi untuk submission UAS
-- [ ] Unit test (pytest) untuk endpoint kritis
-- [ ] Rate limiting middleware berbasis Redis (saat ini hanya DB-based)
-- [ ] Integrasi Raja Ongkir API untuk data ongkir real
+- [x] Unit test (pytest) coverage untuk scale-up endpoints — DONE 2026-04-25 (8 tests)
 - [ ] SMS OTP via Twilio/Fonnte
+
+---
+
+## 🗓️ Session Log
+
+### 2026-04-25 — AI IDE (Antigravity)
+**TODO 1**: Cek `.env` → Key `RAJA_ONGKIR_API_KEY` sudah ada di baris 20. Tidak ada perubahan diperlukan.
+
+**TODO 2**: Update test suite `tests/test_main.py`
+- Tambah `test_shipment_valid_payload` dengan mock DB + mock API key (dependency override)
+- Buat `tests/conftest.py` — patch SlowAPI limiter ke MemoryStorage agar tidak butuh Redis live
+- Buat `.flake8` — config lint standar: critical errors check, style legacy diizinkan
+- Hasil: `pytest tests/` → **8 passed, 0 failed** | `flake8 app/` → **0 errors**
+- Status bridge.md: `[?] VERIFY`
+
+**TODO 3**: Fix GitHub Actions CI | File: `.github/workflows/lint-test.yml`
+- Update actions ke versi terbaru (v4/v5)
+- Tambah `env:` block untuk pytest (mocking env vars)
+- Konfigurasi flake8 agar menggunakan `.flake8` config file
+- Status bridge.md: `[?] VERIFY`
+
+**TODO 4**: Final Security Hardening (Manual by User)
+- Aktivasi **Cloudflare Turnstile** (Captcha) pada `index.html`.
+- Refaktor flow login/register agar menggunakan JSON-based request + `X-Captcha-Token` header.
+- Status bridge.md: `[x] DONE`
+

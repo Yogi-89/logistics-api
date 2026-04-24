@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="assets/style.css?v=1.2">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
     <div id="toast-container"></div>
@@ -202,9 +202,9 @@
                     </div>
                     
                     <!-- Cloudflare Turnstile Widget -->
-                    <!-- <div id="captcha-group" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+                    <div id="captcha-group" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
                         <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="onCaptchaVerified" data-theme="dark"></div>
-                    </div> -->
+                    </div>  
 
                     <div class="modal-footer-spread">
                         <div id="auth-footer-toggle-wrap">
@@ -553,8 +553,8 @@
         let regEmail = ''; 
         let resendTimer = null;
         let resendCount = 0;
-        let captchaToken = "test-token"; 
-        // window.onCaptchaVerified = (token) => { captchaToken = token; };
+        let captchaToken = "test-token"; // Fallback for local testing
+        window.onCaptchaVerified = (token) => { captchaToken = token; };
 
         document.getElementById('auth-toggle-btn').onclick = () => {
             showAuth(authMode === 'register' ? 'login' : 'register');
@@ -604,7 +604,7 @@
                     const res = await fetch(`${API_URL}/auth/register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password, email, captcha_token: "test-token" })
+                        body: JSON.stringify({ username, password, email, captcha_token: captchaToken })
                     });
                     const data = await res.json();
                     if (res.ok) {
@@ -628,14 +628,13 @@
                         showToast(t('toast_verify_error'), 'error');
                     }
                 } else {
-                    const formData = new FormData();
-                    formData.append('username', username || '');
-                    formData.append('password', password || '');
-
                     const res = await fetch(`${API_URL}/auth/login`, {
                         method: 'POST',
-                        // headers: { 'X-Captcha-Token': captchaToken },
-                        body: formData
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Captcha-Token': captchaToken 
+                        },
+                        body: JSON.stringify({ username, password })
                     });
                     const data = await res.json();
                     if (res.ok) {

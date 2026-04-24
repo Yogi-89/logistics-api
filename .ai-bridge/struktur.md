@@ -13,8 +13,9 @@ logistics-api/
 ├── docs/                ← Kosong (placeholder docs)
 ├── frontend/            ← 🔑 Seluruh UI (HTML/CSS/JS)
 ├── postman/             ← Collection Postman untuk testing
-├── scratch/             ← Script debug/forensik sementara
+├── tests/               ← [BARU] Unit & Integration Tests (pytest)
 ├── .env                 ← Konfigurasi environment
+├── .flake8              ← [BARU] Konfigurasi linting
 ├── logistics.db         ← SQLite (dev fallback, tidak dipakai aktif)
 ├── requirements.txt     ← Dependency Python
 └── *.md                 ← Berbagai file dokumentasi

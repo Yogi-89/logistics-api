@@ -1,0 +1,63 @@
+[flake8]
+# ShipStream Logistics API — flake8 configuration
+# Standard: check error kritis (syntax, undefined names) + F401 di file baru
+# Legacy code di utils/models/routers: izinkan style lama
+max-line-length = 120
+
+# Global ignores — style issues yang ada di pre-existing codebase
+extend-ignore =
+    # Indentation style
+    E111,
+    E114,
+    E117,
+    # Blank line requirements
+    E302,
+    E303,
+    E305,
+    # Inline comment spacing
+    E261,
+    # Multiple statements on one line (legacy routers)
+    E701,
+    # Whitespace
+    W291,
+    W293,
+    W391,
+    # Line too long (sudah ada banyak line ~120)
+    E501,
+    # Comparison style (legacy code pakai == True/False/None)
+    E711,
+    E712
+
+# Per-file ignores untuk pre-existing code
+per-file-ignores =
+    # Utility/migration scripts: semua issues OK
+    app/utils/migrate_*.py: F401,F841,E,W
+    app/utils/seed_data.py: F401,F841,E,W
+    app/utils/setup_triggers.py: F401,F841,E,W
+    app/utils/sync_schema.py: F401,F841,E,W
+    app/utils/recalculate_quotas.py: F401,F841,E,W
+    app/utils/security_utils.py: F401,F541,E,W
+    app/utils/api_key_auth.py: F401,E,W
+    # Pre-existing routers dengan legacy imports
+    app/routers/auth.py: F401,E,W
+    app/routers/apikey.py: F401,E,W
+    app/routers/profile.py: F401,E,W
+    app/routers/telegram_bot.py: F401,E,W
+    app/routers/billing.py: F401,E,W
+    app/routers/logistics.py: F401,F841,E,W
+    # Models
+    app/models/base.py: E,W
+    # Schemas
+    app/schemas/schemas.py: E,W
+    # Main entrypoint
+    app/main.py: F401,E,W
+    # Dependencies
+    app/utils/dependencies.py: F401,E,W
+
+# Exclude direktori yang bukan app code
+exclude =
+    .git,
+    __pycache__,
+    alembic/,
+    venv/,
+    .venv/

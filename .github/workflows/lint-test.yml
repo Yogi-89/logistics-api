@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python 3.13
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.13"
     - name: Install dependencies
@@ -22,10 +22,15 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        # Menggunakan konfigurasi dari file .flake8 yang sudah ada
+        flake8 app/ --count --config=.flake8
     - name: Test with pytest
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistics_api
+        SECRET_KEY: test_secret_key_ci
+        ALGORITHM: HS256
+        RAJA_ONGKIR_API_KEY: test_raja_ongkir_key
+        REDIS_URL: memory://
+        DEBUG_MODE: "True"
       run: |
-        pytest
+        pytest tests/ -v

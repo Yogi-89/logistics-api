@@ -22,6 +22,8 @@
 | **fpdf2** | Latest | Generate PDF (Shipping Label) |
 | **httpx** | Latest | Async HTTP client (Telegram, CoinGecko, BaseScan) |
 | **resend** | Latest | Email OTP via Resend.com API |
+| **pytest** | Latest | Framework testing Python |
+| **flake8** | Latest | Linter untuk konsistensi gaya kode |
 
 ---
 

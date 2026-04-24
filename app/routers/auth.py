@@ -19,8 +19,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post("/register", response_model=schemas.User)
 async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # 1. Verify Captcha
-    # if not await verify_turnstile(user.captcha_token):
-    #     raise HTTPException(status_code=400, detail="Captcha verification failed")
+    if not await verify_turnstile(user.captcha_token):
+        raise HTTPException(status_code=400, detail="Captcha verification failed")
 
     # 2. Check existing user
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
@@ -37,14 +37,14 @@ async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         email=user.email,
         phone_number=user.phone_number,
         hashed_password=hashed_password,
-        is_verified=True # Bypassed for testing - auto verify
+        is_verified=False
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
     # 3. Create & 'Send' Verification Code
-    # create_verification_code(db, new_user.id, "email", "registration")
+    create_verification_code(db, new_user.id, "email", "registration")
     
     return new_user
 
@@ -74,9 +74,9 @@ def verify_code(req: schemas.VerificationCode, db: Session = Depends(get_db)):
 @router.post("/login", response_model=schemas.Token)
 async def login(request: Request, login_data: LoginJSON, db: Session = Depends(get_db)):
     # 1. Verify Turnstile
-    # captcha_token = request.headers.get("X-Captcha-Token")
-    # if not await verify_turnstile(captcha_token):
-    #     raise HTTPException(status_code=400, detail="Security validation failed")
+    captcha_token = request.headers.get("X-Captcha-Token")
+    if not await verify_turnstile(captcha_token):
+        raise HTTPException(status_code=400, detail="Security validation failed")
 
     user = db.query(models.User).filter(
         (models.User.username == login_data.username) | 
@@ -90,11 +90,11 @@ async def login(request: Request, login_data: LoginJSON, db: Session = Depends(g
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # if not user.is_verified:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="NEED_VERIFICATION", # Specific code for Frontend detection
-    #     )
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="NEED_VERIFICATION", # Specific code for Frontend detection
+        )
     
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token, jti = security.create_access_token(

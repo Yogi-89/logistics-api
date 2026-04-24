@@ -61,6 +61,17 @@ class City(Base):
     type = Column(String) # Kota, Kabupaten
     postal_code = Column(String)
 
+    subdistricts = relationship("Subdistrict", back_populates="city")
+
+class Subdistrict(Base):
+    __tablename__ = "subdistricts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    city_id = Column(Integer, ForeignKey("cities.id", ondelete="CASCADE"))
+    
+    city = relationship("City", back_populates="subdistricts")
+
 class Courier(Base):
     __tablename__ = "couriers"
 
@@ -80,12 +91,29 @@ class Tracking(Base):
     origin_city_id = Column(Integer, ForeignKey("cities.id"))
     destination_city_id = Column(Integer, ForeignKey("cities.id"))
     
-    # New Fields for Shipping Labels
+    # Scale-up: Detailed Logistics Data
+    service_type = Column(String, nullable=True) # REG, YES, OKE
+    weight_gram = Column(Integer, default=1000)
+    length_cm = Column(Integer, nullable=True)
+    width_cm = Column(Integer, nullable=True)
+    height_cm = Column(Integer, nullable=True)
+    insurance_value = Column(Float, default=0.0)
+    shipping_cost = Column(Float, default=0.0)
+    
+    # Origin & Destination Detail
     sender_name = Column(String, nullable=True)
     sender_phone = Column(String, nullable=True)
+    sender_address = Column(String, nullable=True)
+    sender_postal_code = Column(String, nullable=True)
+    sender_lat = Column(Float, nullable=True)
+    sender_long = Column(Float, nullable=True)
+
     receiver_name = Column(String, nullable=True)
     receiver_phone = Column(String, nullable=True)
     receiver_address = Column(String, nullable=True)
+    receiver_postal_code = Column(String, nullable=True)
+    receiver_lat = Column(Float, nullable=True)
+    receiver_long = Column(Float, nullable=True)
 
     last_updated = Column(DateTime, default=datetime.utcnow)
     history = Column(JSON) # List of status updates
