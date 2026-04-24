@@ -1,0 +1,1615 @@
+/* Typography handled in index.html for performance */
+
+:root {
+    --bg-color: #0b0d11;
+    --card-bg: #151921;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: rgba(30, 41, 59, 0.7);
+    --success: #10b981;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --glass-bg: rgba(21, 25, 33, 0.75);
+}
+
+.btn-danger-outline {
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: var(--danger);
+    background: transparent;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger-outline:hover {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    touch-action: manipulation;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-outline:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+    transition: transform 0.08s ease, opacity 0.08s ease;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+h1, h2, h3, .logo, .price {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+/* Hide Spinners for number inputs */
+body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Smooth Tab Transition Animation */
+@keyframes fadeInTab {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[id^="tab-"]:not([style*="display: none"]) {
+    animation: fadeInTab 0.4s ease forwards;
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: 
+        linear-gradient(to bottom, rgba(11, 13, 17, 0.4), rgba(11, 13, 17, 0.9)),
+        url('hero.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    scroll-behavior: smooth;
+}
+
+/* Elite Grain Texture */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    z-index: 9999;
+}
+
+/* Landing Navigation */
+.landing-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: rgba(11, 13, 17, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 2000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-primary) !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--accent) !important;
+    transform: translateY(-2px);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 2rem 0; /* 80px padding-top to account for fixed navbar */
+}
+
+.container-fluid {
+    width: 100%;
+    max-width: none;
+    padding: 0 4%;
+}
+
+/* Glassmorphism */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+    border-radius: 1.25rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-sizing: border-box;
+}
+
+.glass:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 16px 50px 0 rgba(99, 102, 241, 0.15), 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+    transform: translateY(-4px);
+}
+
+.navbar-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .navbar-main {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0;
+    }
+    
+    #user-info {
+        width: 100%;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #global-quota-header {
+        margin-left: 0 !important;
+        margin-right: auto;
+    }
+}
+
+.logo {
+    font-family: 'Fira Code', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--accent-glow);
+    filter: brightness(1.1);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero {
+    padding: 12rem 0 8rem;
+    text-align: center;
+    background: transparent;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.hero h1 {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+}
+
+/* Brands Section */
+.logo-grid-wrapper {
+    padding: 1rem 0 4rem; /* Reduced top padding, added bottom for transition */
+}
+
+.logo-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3rem;
+}
+
+.logo-item {
+    /* Mempertahankan warna asli namun dengan pendaran putih halus agar jelas di latar gelap */
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+    opacity: 0.85;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.logo-item:hover {
+    /* Pendaran lebih kuat dan terang tanpa menghilangkan detail tulisan kecil */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 1)) brightness(1.1);
+    opacity: 1;
+    transform: scale(1.08) translateY(-5px);
+}
+
+/* Auth Modal System */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 5000;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.auth-modal {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpModal {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.auth-card {
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.modal-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.modal-close:hover {
+    background: var(--danger);
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* Section Styling */
+.section-head {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-head h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.features-grid, .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    padding: 3rem 2.5rem;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 2rem;
+}
+
+.pricing-card {
+    padding: 3.5rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.pricing-card.featured {
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+    transform: scale(1.05);
+}
+
+.pricing-card.featured:hover {
+    transform: scale(1.08) translateY(-10px);
+}
+
+.pricing-badge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: var(--accent);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 1.5rem 0 2rem;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.price span {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 0.25rem;
+    white-space: nowrap;
+}
+
+.pricing-features {
+    list-style: none;
+    margin-bottom: 2.5rem;
+    flex-grow: 1;
+}
+
+.pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.pricing-features li i {
+    width: 18px;
+    height: 18px;
+}
+
+/* Logos */
+.logo-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    margin: 4rem auto;
+    flex-wrap: wrap;
+}
+
+.logo-item {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: pointer;
+}
+
+/* Dim siblings slightly when one is hovered */
+.logo-grid:hover .logo-item:not(:hover) {
+    opacity: 0.2;
+    transform: scale(0.95);
+}
+
+.logo-item:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* Dynamic Brand Spotlight Colors */
+.logo-item:nth-child(1):hover { filter: grayscale(0) drop-shadow(0 0 30px rgba(59, 130, 246, 1)); } /* JNE: Royal Blue */
+.logo-item:nth-child(2):hover { filter: grayscale(0) drop-shadow(0 0 30px rgba(239, 68, 68, 1)); } /* J&T: Bright Red */
+.logo-item:nth-child(3):hover { filter: grayscale(0) drop-shadow(0 0 30px rgba(220, 38, 38, 1)); } /* SiCepat: Crimson/Red */
+.logo-item:nth-child(4):hover { filter: grayscale(0) drop-shadow(0 0 30px rgba(249, 115, 22, 1)); } /* Pos Indonesia: Orange */
+.logo-item:nth-child(5):hover { filter: grayscale(0) drop-shadow(0 0 30px rgba(236, 72, 153, 1)); } /* Anteraja: Magenta/Pink */
+
+/* Auth Cards */
+.auth-container {
+    display: flex;
+    justify-content: center;
+}
+
+.auth-box, .auth-card {
+    width: auto;
+    max-width: 480px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: rgba(15, 18, 24, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.85rem;
+    color: white;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: rgba(99, 102, 241, 0.2);
+    background: rgba(21, 25, 33, 0.7);
+}
+
+/* When select is inside .select-wrapper, override to give space for the icon */
+.form-group .select-wrapper select,
+.select-wrapper select {
+    padding: 0.85rem 2.75rem 0.85rem 1rem;
+    background: rgba(15, 18, 24, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.85rem;
+    font-size: 1rem;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--accent);
+    background: rgba(21, 25, 33, 0.9);
+    box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+/* Fix Autocomplete style */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:autofill {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0px 1000px #151921 inset !important;
+    caret-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Premium Field Wrapper (formerly password-wrapper, renamed to avoid browser password-saver heuristics) */
+.field-premium-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field-premium-wrapper input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    padding-right: 3rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Premium Select Wrapper */
+.select-wrapper {
+    position: relative;  /* CRITICAL: anchor for the absolute icon */
+    display: block;
+    width: 100%;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 0.85rem 2.75rem 0.85rem 1rem; /* right padding reserves space for icon */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.95rem;
+    appearance: none;           /* hide native arrow on all browsers */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.select-wrapper select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+/* Works for both <i> elements AND Lucide-rendered <svg> */
+.select-wrapper > i,
+.select-wrapper > svg {
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-secondary);
+    width: 16px;
+    height: 16px;
+    opacity: 0.75;
+    display: block; /* ensure SVG doesn't add extra inline spacing */
+}
+
+/* Added: Support for icons on the left of the select */
+.select-icon-left {
+    position: absolute !important;
+    left: 1rem !important;
+    right: auto !important;
+    color: var(--accent) !important;
+    opacity: 0.9 !important;
+    z-index: 5;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    pointer-events: none;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Adjust select padding when a left icon is present */
+.select-wrapper.has-icon-left select {
+    padding-left: 3.2rem !important;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.password-toggle:hover {
+    color: var(--text-primary);
+}
+
+/* Phone Input with Country Code */
+.phone-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.country-code-select {
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: white;
+    padding: 0.75rem;
+    padding-right: 2.5rem;
+    height: 100%;
+    outline: none;
+    cursor: pointer;
+}
+
+.country-code-select:focus {
+    border-color: var(--accent);
+}
+
+/* Dashboard Layout (Master Grid - Single Nav) */
+/* .dashboard-layout consolidated below */
+
+/* Content Headings Fluid Type */
+.content h2 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    margin-bottom: 0.5rem;
+}
+
+.content p {
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+}
+
+/* ================================================
+   RESPONSIVE SYSTEM — Mobile First
+   Breakpoints:
+     xs / mobile  : < 640px
+     sm / tablet  : 640px - 1023px
+     md / desktop : >= 1024px
+   ================================================ */
+
+/* Desktop Enhancement */
+@media (min-width: 1024px) {
+    /* Consolidated .dashboard-layout padding */
+}
+
+/* Tablet (640px - 1023px) */
+/* ========================================= */
+/* TABLET & MEDIUM SCREENS (640px - 1024px) */
+/* ========================================= */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .container {
+        padding: 80px 1.5rem 0;
+    }
+    
+    .container-fluid {
+        padding: 0 2%;
+    }
+    
+    h2 {
+        font-size: 1.75rem !important;
+        line-height: 1.35;
+    }
+    
+    .responsive-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .navbar-main {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    /* Consolidated .dashboard-layout padding */
+}
+
+/* Mobile (< 640px) — Force single column on all grids */
+@media (max-width: 639px) {
+
+    .dashboard-layout {
+        padding: 1rem 0;
+        padding-bottom: 110px;
+    }
+
+    .content {
+        padding: 0 1rem;
+    }
+
+    .grid-2-col {
+        grid-template-columns: 1fr;
+    }
+
+    .doc-table td:first-child {
+        width: 80px !important;
+        font-size: 0.75rem;
+    }
+
+    /* Collapse ALL inline 2-column grids to single column.
+       Targets every div that uses grid-template-columns inline. */
+    [style*="grid-template-columns: 1fr 1fr"],
+    [style*="grid-template-columns: 1fr 1fr;"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Settings two-column: left wrapper + right card */
+    [style*="grid-template-columns: 1fr 1fr; gap: 1.5rem"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Wrap flex rows that might overflow */
+    [style*="display: flex"][style*="gap"] {
+        flex-wrap: wrap;
+    }
+
+    /* Billing summary card */
+    .glass[style*="justify-content: space-between"] {
+        flex-direction: column !important;
+        gap: 1rem;
+        align-items: flex-start !important;
+    }
+
+    /* Key card header row */
+    [style*="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem"] {
+        flex-direction: column !important;
+        gap: 1rem;
+        align-items: flex-start !important;
+    }
+
+    /* Security / profile info 2-col row */
+    [style*="display: flex; gap: 1rem; margin-bottom: 2rem"] {
+        flex-direction: column !important;
+    }
+
+    /* Toast: anchor to bottom on mobile instead of top-right */
+    #toast-container {
+        top: max(16px, env(safe-area-inset-top)) !important;
+        right: 16px !important;
+        bottom: unset !important;
+        left: unset !important;
+        z-index: 99999 !important;
+        max-width: min(360px, calc(100vw - 32px)) !important;
+    }
+
+    .toast {
+        min-width: unset !important;
+        width: 100%;
+    }
+
+    /* Modal inner content */
+    .glass[style*="max-width"] {
+        width: 95% !important;
+    }
+
+    /* Quick-usage code grid collapse */
+    [style*="grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Floating dock: tighter on very small screens */
+    .floating-nav-dock {
+        width: 96%;
+        padding: 0 0.75rem;
+    }
+
+    .mobile-nav-item {
+        min-width: 48px;
+        font-size: 0.6rem;
+    }
+
+    /* 3. Modal Forms (Login/Register/Topup) moved from global */
+    .auth-box, .auth-card {
+        width: 100% !important;
+        max-width: 95% !important;
+        margin: 1rem auto !important;
+        padding: 1.5rem !important;
+    }
+    .auth-container { padding: 1rem !important; }
+}
+
+
+.content {
+    min-width: 0; /* Prevent grid blowout */
+}
+
+.sidebar {
+    display: none !important; /* Sidebar retired in favor of Floating Dock */
+}
+
+.sidebar nav a {
+    transition: all 0.2s ease;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.sidebar nav a:hover {
+    background: rgba(255,255,255,0.05);
+    color: white !important;
+}
+
+.api-key-code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.btn-cancel {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary) !important;
+}
+
+.btn-cancel:hover {
+    border-color: white;
+    color: white !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+/* Toast System */
+#toast-container {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.toast {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 300px;
+    animation: slideIn 0.3s ease forwards;
+    color: white;
+}
+
+.toast-success { border-left-color: var(--success); }
+.toast-error { border-left-color: var(--danger); }
+.toast-warning { border-left-color: #fbbf24; }
+.toast-info { border-left-color: var(--accent); }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.fade-out {
+    animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* Pro Max Floating Dock Navigation */
+.floating-nav-dock {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    height: 70px;
+    background: rgba(11, 13, 17, 0.85); /* OLED Deep Dark */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px; /* Pill/Dock Shape */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.65rem;
+    padding: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-width: 60px;
+}
+
+.mobile-nav-item.active {
+    color: var(--accent);
+}
+
+.mobile-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.mobile-nav-item svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.3s ease;
+}
+
+.mobile-nav-item:active svg {
+    transform: scale(0.85);
+}
+
+/* --- Premium Custom Dropdown Component --- */
+.custom-select-container {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    background: rgba(15, 18, 24, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.85rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.custom-select-trigger:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(21, 25, 33, 0.8);
+}
+
+.custom-select-trigger.open {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.custom-select-trigger i {
+    transition: transform 0.3s ease;
+    opacity: 0.7;
+}
+
+.custom-select-trigger.open i {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: rgba(21, 25, 33, 0.92);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.98);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    padding: 0.5rem;
+}
+
+.custom-select-container.open .custom-select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.custom-select-option {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-radius: 0.65rem;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-select-option:hover {
+    background: rgba(99, 102, 241, 0.15);
+    color: white;
+}
+
+.custom-select-option.selected {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.custom-select-option.selected::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* ========================================= */
+/* DESKTOP GRID LAYOUTS                      */
+/* ========================================= */
+.dashboard-layout {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+    padding-bottom: 2rem;
+}
+
+.content {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+}
+
+.content h2 {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-top: 2rem;
+    gap: 1rem;
+}
+
+.tab-header-text h2 {
+    font-size: 1.875rem;
+    text-align: left !important;
+    margin: 0 0 0.25rem 0 !important;
+}
+
+.tab-header-text p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 0 1rem;
+    }
+}
+
+/* Responsive Grid System - Properly Centered */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Responsive Grid System - Handled in consolidated media query below */
+
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.grid-2-col .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-2-col .form-group label {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 0.25rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    justify-items: start;
+    align-items: start;
+}
+
+/* Ensure cards don't exceed safe width for centering */
+.responsive-grid .glass {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .responsive-grid .glass {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+}
+
+.dashboard-grid > .glass,
+.dashboard-grid > div {
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+/* .responsive-grid handled by consolidated rule above */
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .responsive-grid,
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        justify-items: stretch !important;
+        gap: 1.25rem;
+        width: 100% !important;
+    }
+    
+    .responsive-grid > .glass,
+    .dashboard-grid > .glass,
+    .dashboard-grid > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    div#tab-settings div.responsive-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    div#tab-settings div.responsive-grid > div.glass {
+        grid-column: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    #tab-settings {
+        padding: 1rem !important;
+    }
+
+    #tab-profile h2, #tab-settings h2, #tab-keys h2, #tab-docs h2, #tab-billing h2 {
+        text-align: center !important;
+        margin-bottom: 2rem !important;
+    }
+
+    /* Prevent inner content overflow in cards */
+    #tab-settings .glass,
+    #tab-profile .glass {
+        overflow: hidden;
+        word-break: break-word;
+        min-width: 0;
+    }
+
+    #tab-settings .glass *,
+    #tab-profile .glass * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix flex rows inside cards */
+    #tab-settings .glass > div,
+    #tab-profile .glass > div {
+        min-width: 0;
+        flex-shrink: 1;
+    }
+
+    /* Fix input dan text overflow */
+    #tab-settings input,
+    #tab-profile input,
+    #tab-settings .glass p,
+    #tab-profile .glass p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    /* Jangan wrap baris email dan HP di mobile */
+    #tab-profile .glass [style*="display: flex"][style*="align-items: center"],
+    #tab-profile .glass [style*="display:flex"][style*="align-items:center"] {
+        flex-wrap: nowrap !important;
+        gap: 0.5rem !important;
+    }
+
+    /* Email text truncate agar tombol tidak tergeser */
+    #tab-profile .glass [style*="display: flex"] span,
+    #tab-profile .glass [style*="display: flex"] p {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+    }
+
+    /* Tombol Ubah jangan shrink */
+    #tab-profile .glass .btn-outline {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    /* Animation Optimization */
+    .glass:hover {
+        transform: none !important;
+    }
+
+    .glass {
+        transition: box-shadow 0.15s ease !important;
+    }
+
+    @keyframes fadeInTab {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+    /* Moved from global scope into 768px media query */
+    /* 1. Landing Page Navigation (Sticky Horizontal Layout) */
+    .landing-nav {
+        height: auto !important;
+        padding-bottom: 0.5rem;
+    }
+    .nav-container {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        justify-content: space-between !important;
+        padding: 0.5rem 1rem !important; /* Slimmer padding on mobile */
+    }
+    .nav-links {
+        width: 100%; /* forces to new line below logo */
+        margin-top: 0.5rem;
+        justify-content: space-between !important; /* Spread evenly across screen */
+        gap: 0.25rem !important;
+    }
+    .nav-links a { font-size: 0.8rem; }
+    .nav-links .btn {
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* 2. Hero Section - Prevent hide behind sticky navbar */
+    .container { padding-top: 110px !important; }
+    .hero { padding: 3rem 1rem 3rem !important; }
+    .hero h1 { font-size: 2rem !important; line-height: 1.25; }
+    
+    /* 2.5 Scale Down Huge Mobile Fonts */
+    h2 {
+        font-size: 1.6rem !important;
+        line-height: 1.3;
+    }
+
+    .pricing-grid { grid-template-columns: 1fr !important; }
+    .logo-item { height: 65px !important; } /* Make logos bolder/larger on mobile screens */
+
+    /* 4. Dashboard (Prevent Float Nav Overlap) */
+    body { padding-bottom: 95px !important; }
+
+    /* Dashboard Navbar (Top Row) */
+    .navbar-main {
+        flex-direction: column; /* keep column but align left */
+        align-items: flex-start !important;
+        padding: 1rem;
+    }
+    #user-info {
+        flex-direction: row !important; /* KEEP ROW for user info! */
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100%;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        gap: 0.5rem !important;
+    }
+    #global-quota-header {
+        width: auto !important;
+        text-align: left !important;
+    }
+    
+    /* 5. Dashboard Header / Keys Navigation preventing lateral overflow */
+    #tab-keys > div:first-child,
+    #tab-settings > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+        text-align: left;
+    }
+
+    /* Fix internal grid inside dashboard keys usage */
+    #global-usage-widget { padding: 1rem !important; }
+    
+    #global-usage-widget > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+    #global-usage-widget > div:first-child > div:last-child {
+        width: 100%;
+        text-align: left !important;
+        flex-direction: row !important; /* Keep Request Texts and Button inline */
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 1rem;
+    }
+    /* 6. API Key Cards Layout Fix */
+    .key-card {
+        padding: 1rem;
+    }
+
+    .key-card .key-card-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .key-card .key-card-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .key-card .key-code-wrapper {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .key-card .api-key-code {
+        font-size: 0.7rem;
+        word-break: break-all;
+        width: 100%;
+    }
+
+    .key-card .key-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        text-align: left;
+    }
+    
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .tab-header .btn {
+        width: 100%;
+    }
+
+    .content h2 {
+        text-align: center;
+    }   
+
+    /* 7. Cloudflare Turnstile Widget Mobile Fix */
+    #captcha-group {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        background: #111; /* Matching CF dark theme bg cleanly */
+        border: 1px solid rgba(255,255,255,0.05); /* Soft wrapper to hide sharp iframe edges */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    
+    @media (max-width: 380px) {
+        .cf-turnstile {
+            transform: scale(0.88);
+            transform-origin: center center;
+        }
+    }
+
+    .dashboard-grid { 
+        grid-template-columns: 1fr !important; 
+        width: 100% !important;
+    }
+    
+    #tab-profile h2, #tab-settings h2, #tab-keys h2, #tab-docs h2 {
+        text-align: center !important;
+        margin-bottom: 2rem !important;
+    }
+}
+
+/* Modal Footer Layout */
+.modal-footer-spread {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    width: 100%;
+    gap: 1rem;
+    flex-wrap: nowrap !important; /* Ensure side-by-side even on small cards */
+}
+
+.modal-footer-spread .btn {
+    width: auto !important; /* Prevent button from taking 100% width in footer */
+    padding: 0.75rem 1.5rem;
+}
+
+/* Industrial Resend Link */
+.link-resend {
+    color: var(--accent);
+    text-decoration: underline;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    font-weight: 500;
+}
+
+.link-resend:hover {
+    color: var(--accent-hover);
+    text-shadow: 0 0 8px var(--accent-glow);
+}
+
+.link-resend.disabled {
+    color: var(--text-secondary);
+    text-decoration: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+  body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+
+  .modal-overlay,
+  [id$="-modal"] {
+    cursor: pointer;
+  }
+
+  .modal-content,
+  .modal-box,
+  .modal-card,
+  [id$="-modal"] > div,
+  [id$="-modal"] > .glass {
+    cursor: default;
+    position: relative;
+    z-index: 1;
+  }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

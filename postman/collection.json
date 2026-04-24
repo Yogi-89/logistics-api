@@ -1,0 +1,152 @@
+{
+	"info": {
+		"_postman_id": "82e4212d-90f9-4601-aaf5-3bb372eb22f7",
+		"name": "Logistics Rate & Tracking API (UTS)",
+		"description": "Collection for testing Logistics API endpoints for UTS Pemrograman API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\",\n    \"email\": \"test@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "username", "value": "testuser", "type": "text" },
+								{ "key": "password", "value": "password123", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "API Key Management",
+			"item": [
+				{
+					"name": "Generate API Key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Mobile App\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/apikey/generate",
+							"host": ["{{baseUrl}}"],
+							"path": ["apikey", "generate"]
+						}
+					}
+				},
+				{
+					"name": "List API Keys",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/apikey/list",
+							"host": ["{{baseUrl}}"],
+							"path": ["apikey", "list"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Logistics Data (Needs X-API-Key)",
+			"item": [
+				{
+					"name": "List Couriers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/couriers",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "couriers"]
+						}
+					}
+				},
+				{
+					"name": "Check Cost",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/cost?origin_id=1&destination_id=2&courier_code=jne",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "cost"],
+							"query": [
+								{ "key": "origin_id", "value": "1" },
+								{ "key": "destination_id", "value": "2" },
+								{ "key": "courier_code", "value": "jne" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Track Package",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/tracking/LGS-12345678",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "tracking", "LGS-12345678"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8000" },
+		{ "key": "token", "value": "" },
+		{ "key": "apiKey", "value": "" }
+	]
+}

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipStream API - Industrial Logistics Infrastructure</title>
+    <link rel="stylesheet" href="assets/style.css?v=1.2">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <div class="nav-container">
+            <div class="logo">SHIPSTREAM</div>
+            <div class="nav-links">
+                <a href="#features" data-i18n="nav_features">Features</a>
+                <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
+                
+                <!-- Language Switcher -->
+                <div class="lang-switcher" onclick="toggleLanguage()" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1); margin-right: 0.5rem;">
+                    <img id="lang-flag" src="https://flagcdn.com/w20/us.png" style="width: 16px; border-radius: 2px;">
+                    <span id="lang-label" style="font-size: 0.75rem; font-weight: 700;">EN</span>
+                </div>
+
+                <a href="javascript:void(0)" onclick="showAuth('login')" data-i18n="nav_login">Login</a>
+                <button class="btn btn-primary" onclick="showAuth('register')" data-i18n="nav_cta">Register Free</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container" style="padding-top: 0;">
+            <div style="margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.1); padding: 0.5rem 1.25rem; border-radius: 999px; border: 1px solid rgba(99, 102, 241, 0.2); font-size: 0.8rem; font-weight: 600; color: var(--accent);">
+                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+                <span data-i18n="hero_badge">V1.2 INDUSTRIAL SCALE UPDATE</span>
+            </div>
+            <h1 data-i18n="hero_title">Elite API for <span style="color: var(--accent);">Modern Logistics</span></h1>
+            <p data-i18n="hero_subtitle">Satu integrasi untuk akses tarif pengiriman, tracking real-time, dan manajemen armada nasional. Dibangun untuk infrastruktur paket masa depan.</p>
+            <div class="hero-actions">
+                <button class="btn btn-primary" onclick="showAuth('register')" data-i18n="hero_cta_start">Get Started Now</button>
+                <a href="#features" class="btn btn-outline" data-i18n="hero_cta_features">Learn Features</a>
+            </div>
+
+            <!-- Tech Stats Section -->
+            <div style="margin-top: 5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 3rem;">
+                <div style="text-align: center;">
+                    <div style="font-family: 'Outfit'; font-size: 2rem; font-weight: 700; color: #fff;">99.9<span style="color: var(--accent);">%</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1rem; margin-top: 0.5rem;" data-i18n="stat_uptime">System Uptime</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-family: 'Outfit'; font-size: 2rem; font-weight: 700; color: #fff;">&lt;50<span style="color: var(--accent);">ms</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1rem; margin-top: 0.5rem;" data-i18n="stat_latency">Node Latency</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-family: 'Outfit'; font-size: 2rem; font-weight: 700; color: #fff;">35<span style="color: var(--accent);">+</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1rem; margin-top: 0.5rem;" data-i18n="stat_cities">Cities Covered</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-family: 'Outfit'; font-size: 2rem; font-weight: 700; color: #fff;">JSON<span style="color: var(--accent);">/</span>REST</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1rem; margin-top: 0.5rem;" data-i18n="stat_format">Architecture</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brands Section -->
+    <div class="logo-grid-wrapper">
+        <div class="container" style="padding-top: 0; padding-bottom: 0;">
+            <div class="logo-grid">
+                <img src="assets/img/logistics/JNE.png" alt="JNE" class="logo-item" style="height: 120px; width: auto;">
+                <img src="assets/img/logistics/JNT.png" alt="J&T" class="logo-item" style="height: 120px; width: auto;">
+                <img src="assets/img/logistics/SiCepat.png" alt="SiCepat" class="logo-item" style="height: 120px; width: auto;">
+                <img src="assets/img/logistics/Pos-Indonesia.png" alt="Pos Indonesia" class="logo-item" style="height: 120px; width: auto;">
+                <img src="assets/img/logistics/anteraja.png" alt="Anteraja" class="logo-item" style="height: 120px; width: auto;">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Features Section -->
+        <section id="features" style="padding: 6rem 0;">
+            <div class="section-head">
+                <h2 data-i18n="feat_title">Fitur Skala Industri</h2>
+                <p data-i18n="feat_subtitle">Lupakan integrasi manual yang rumit. Pakai infrastruktur kami yang sudah siap skala.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card glass">
+                    <div class="feature-icon"><i data-lucide="layers"></i></div>
+                    <h3 data-i18n="feat_1_title">Unified Logistics stack</h3>
+                    <p data-i18n="feat_1_desc">Satu endpoint untuk cek ongkir dari puluhan kurir ternama sekaligus tanpa ribet.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                    <h3 data-i18n="feat_2_title">Enterprise Security</h3>
+                    <p data-i18n="feat_2_desc">Eksklusif dengan IP Whitelisting, Audit Log, dan enkripsi data end-to-end yang tangguh.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon"><i data-lucide="activity"></i></div>
+                    <h3 data-i18n="feat_3_title">Real-time Webhooks</h3>
+                    <p data-i18n="feat_3_desc">Dapatkan notifikasi perubahan status paket (DELIVERED, IN_TRANSIT) langsung ke server Anda.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" style="padding: 6rem 0;">
+            <div class="section-head">
+                <h2 data-i18n="price_title">Paket Kuota Prepaid</h2>
+                <p data-i18n="price_subtitle">Tanpa biaya bulanan. Tanpa komitmen minimum. Bayar sesuai penggunaan.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card glass">
+                    <h3 data-i18n="price_1_name">Starter</h3>
+                    <div class="price" data-i18n="price_1_val">Rp 10rb<span> / 1.000 req</span></div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_1">Akses Semua Kurir</span></li>
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_2">Tracking Real-time</span></li>
+                        <li><i data-lucide="minus-circle" style="color: var(--text-secondary);"></i> <span data-i18n="price_f_minus_webhook" style="opacity: 0.5;">No Custom Webhook</span></li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="showAuth('register')" data-i18n="price_1_btn">Pilih Starter</button>
+                </div>
+                <div class="pricing-card glass featured">
+                    <div class="pricing-badge" data-i18n="price_best_value">BEST VALUE</div>
+                    <h3 data-i18n="price_2_name">Growth</h3>
+                    <div class="price" data-i18n="price_2_val">Rp 45rb<span> / 5.000 req</span></div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_1">Akses Semua Kurir</span></li>
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_2">Tracking Real-time</span></li>
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_4">Custom Webhook Support</span></li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="showAuth('register')" data-i18n="price_2_btn">Mulai Sekarang</button>
+                </div>
+                <div class="pricing-card glass">
+                    <h3 data-i18n="price_3_name">Enterprise</h3>
+                    <div class="price" data-i18n="price_3_val">Rp 80rb<span> / 10.000 req</span></div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_1">Akses Semua Kurir</span></li>
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_4">Webhook Support</span></li>
+                        <li><i data-lucide="check-circle" style="color: var(--success);"></i> <span data-i18n="price_f_3">Priority Support 24/7</span></li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="showAuth('register')" data-i18n="price_3_btn">Hubungi Sales</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="margin-top: 6rem; padding: 4rem 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+            <div class="logo" style="margin-bottom: 2rem;">SHIPSTREAM</div>
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 2.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                <a href="#" style="color: inherit; text-decoration: none;" data-i18n="nav_about">About</a>
+                <a href="#" style="color: inherit; text-decoration: none;" data-i18n="nav_status">API Status</a>
+                <a href="#" style="color: inherit; text-decoration: none;" data-i18n="nav_security">Security</a>
+                <a href="#" style="color: inherit; text-decoration: none;" data-i18n="nav_tos">Terms of Service</a>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);" data-i18n="footer_copy">© 2026 ShipStream API Indonesia. Powering Logistics for modern commerce.</p>
+        </footer>
+    </div>
+
+    <!-- Auth Modal Container -->
+    <div class="modal-overlay" id="auth-modal-overlay">
+        <div class="auth-modal">
+            <div class="auth-card glass">
+                <button class="modal-close" id="modal-close-btn"><i data-lucide="x"></i></button>
+                <h2 id="auth-title" style="margin-bottom: 1.5rem; text-align: center;" data-i18n="auth_register_title">Register Account</h2>
+                <form id="auth-form" autocomplete="off">
+                    <div class="form-group" id="username-group">
+                        <label data-i18n="auth_label_user">Username</label>
+                        <input type="text" id="username" data-i18n-placeholder="auth_placeholder_user" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                    </div>
+                    <div class="form-group" id="email-group">
+                        <label data-i18n="auth_label_email">Email Address</label>
+                        <input type="text" id="email" data-i18n-placeholder="auth_placeholder_email" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                    </div>
+                    <div class="form-group" id="password-group">
+                        <label data-i18n="auth_label_pass">Password</label>
+                        <div class="field-premium-wrapper">
+                            <input type="password" id="password" data-i18n-placeholder="auth_placeholder_pass" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <i data-lucide="eye" id="password-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="verify-group" style="display: none;">
+                        <div class="form-group">
+                            <label data-i18n="auth_label_otp">Verification Code (OTP)</label>
+                            <input type="text" id="otp-code" placeholder="000000" maxlength="6" autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;" autocapitalize="none" autocorrect="off" spellcheck="false">
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; text-align: center;" data-i18n="auth_otp_hint">Masukkan 6 digit kode yang dikirim ke email Anda.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="verify-resend-area" style="display: none; margin-top: 0.5rem; text-align: center;">
+                        <span id="resend-cooldown-text" style="font-size: 0.75rem; color: var(--text-secondary); display: none;">
+                            <i data-lucide="clock" style="width: 12px; height: 12px; vertical-align: middle;"></i> <span data-i18n="auth_wait">Wait {s}s</span>
+                        </span>
+                        <a href="javascript:void(0)" id="btn-resend-otp" class="link-resend" onclick="resendRegistrationCode()" data-i18n="auth_resend_code">Resend Code</a>
+                    </div>
+                    
+                    <!-- Cloudflare Turnstile Widget -->
+                    <!-- <div id="captcha-group" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+                        <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="onCaptchaVerified" data-theme="dark"></div>
+                    </div> -->
+
+                    <div class="modal-footer-spread">
+                        <div id="auth-footer-toggle-wrap">
+                            <span id="auth-toggle-text" data-i18n="auth_footer_register" style="font-size: 0.85rem; color: var(--text-secondary);">Already have an account?</span>
+                            <a href="javascript:void(0)" id="auth-toggle-btn" style="color: var(--accent); font-size: 0.85rem;" data-i18n="auth_link_login">Login here</a>
+                        </div>
+                        
+                        <div id="verify-back-btn-wrap" style="display: none;">
+                            <button type="button" class="btn btn-outline" onclick="showAuth('register', true)" style="font-size: 0.85rem; padding: 0.6rem 1.2rem;" data-i18n="auth_link_back_reg">Back to Register</button>
+                        </div>
+
+                        <button type="submit" id="auth-submit-btn" class="btn btn-primary" data-i18n="auth_submit">Submit Now</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = `${window.location.origin}`; 
+        const lucide = window.lucide;
+
+        // Resend Logic
+        function resendRegistrationCode() {
+            if (resendCount >= 3) return;
+            resendCount++;
+            let seconds = 60 * Math.pow(2, resendCount - 1);
+            const btn = document.getElementById('btn-resend-otp');
+            const timerText = document.getElementById('resend-cooldown-text');
+            
+            btn.disabled = true;
+            timerText.style.display = 'block';
+            
+            const interval = setInterval(() => {
+                seconds--;
+                timerText.innerHTML = `<i data-lucide="clock" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${t('auth_wait').replace('{s}', seconds)}`;
+                lucide.createIcons();
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    timerText.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        // Translation logic
+        const translations = {
+            id: {
+                nav_features: 'Fitur',
+                nav_pricing: 'Harga',
+                nav_login: 'Login',
+                nav_cta: 'Daftar Gratis',
+                hero_title: 'Elite API for <span style="color: var(--accent);">Modern Logistics</span>',
+                hero_subtitle: 'Satu integrasi untuk akses tarif pengiriman, tracking real-time, dan manajemen armada nasional. Dibangun untuk infrastruktur paket masa depan.',
+                hero_cta_start: 'Mulai Sekarang',
+                hero_cta_features: 'Pelajari Fitur',
+                feat_title: 'Fitur Skala Industri',
+                feat_subtitle: 'Lupakan integrasi manual yang rumit. Pakai infrastruktur kami yang sudah siap skala.',
+                feat_1_title: 'Unified Logistics Stack',
+                feat_1_desc: 'Satu endpoint untuk cek ongkir dari puluhan kurir ternama sekaligus tanpa ribet.',
+                feat_2_title: 'Enterprise Security',
+                feat_2_desc: 'Eksklusif dengan IP Whitelisting, Audit Log, dan enkripsi data end-to-end yang tangguh.',
+                feat_3_title: 'Real-time Webhooks',
+                feat_3_desc: 'Dapatkan notifikasi perubahan status paket (DELIVERED, IN_TRANSIT) langsung ke server Anda.',
+                price_title: 'Paket Kuota Prepaid',
+                price_subtitle: 'Tanpa biaya bulanan. Tanpa komitmen minimum. Bayar sesuai penggunaan.',
+                price_1_name: 'Starter',
+                price_2_name: 'Growth',
+                price_3_name: 'Enterprise',
+                price_f_1: 'Akses Semua Kurir',
+                price_f_2: 'Tracking Real-time',
+                price_f_3: 'Priority Support 24/7',
+                price_f_4: 'Custom Webhook Support',
+                price_btn: 'Pilih Paket',
+                auth_resend_code: 'Kirim Ulang Kode',
+                auth_wait: 'Tunggu {s} detik',
+                auth_resend_limit: 'Batas tercapai (3x)',
+                auth_link_back_reg: 'Kembali ke Daftar',
+                auth_register_title: 'Daftar Akun',
+                auth_login_title: 'Login',
+                auth_verify_title: 'Verifikasi Email',
+                auth_label_user: 'Username',
+                auth_label_user_login: 'Username atau Alamat Email',
+                auth_label_email: 'Alamat Email',
+                auth_label_pass: 'Password',
+                auth_label_otp: 'Kode Verifikasi (OTP)',
+                auth_otp_hint: 'Masukkan 6 digit kode yang dikirim ke email Anda.',
+                auth_submit: 'Kirim Sekarang',
+                auth_footer_register: 'Sudah punya akun? ',
+                auth_footer_login: 'Belum punya akun? ',
+                auth_link_login: 'Login di sini',
+                auth_link_register: 'Daftar di sini',
+                toast_server_err: 'Koneksi Server Gagal.',
+                toast_login_success: 'Login Berhasil! Mengalihkan...',
+                toast_reg_success: 'Registrasi sukses! Cek OTP.',
+                toast_reg_fail: 'Registrasi gagal. Periksa kembali data Anda.',
+                toast_verify_success: 'Verifikasi Berhasil!',
+                toast_verify_error: 'Kode Salah atau Kedaluwarsa',
+                toast_unverified: 'Akun belum diverifikasi. Masukkan kode OTP.',
+                toast_login_fail: 'Username atau password salah',
+                toast_email_missing: 'Data email hilang, silakan refresh',
+                toast_resend_success: 'Kode baru terkirim!',
+                toast_resend_error: 'Gagal mengirim kode',
+                toast_network_error: 'Kesalahan jaringan',
+                toast_error_failed: 'Gagal',
+                toast_error_check: 'Cek data Anda',
+                toast_empty_fields: 'Harap isi semua kolom yang diperlukan',
+                toast_invalid_email: 'Format email tidak valid',
+                auth_placeholder_user: 'Username',
+                auth_placeholder_pass: 'Password',
+                auth_placeholder_email: 'email@contoh.com',
+                auth_sending: 'Mengirim...',
+                alert_limit_reached: 'Batas limit pengiriman OTP tercapai. Silakan isi kembali form pendaftaran.',
+                processing: 'Sedang Memproses...',
+                stat_uptime: 'Waktu Aktif Sistem',
+                stat_latency: 'Latensi Node',
+                stat_cities: 'Kota Tercover',
+                stat_format: 'Arsitektur',
+                hero_badge: 'UPDATE SKALA INDUSTRI V1.2',
+                price_1_val: 'Rp 5rb<span> / 1.000 req</span>',
+                price_f_minus_webhook: 'Tanpa Custom Webhook',
+                price_1_btn: 'Pilih Starter',
+                price_best_value: 'PILIHAN TERBAIK',
+                price_2_val: 'Rp 10rb<span> / 5.000 req</span>',
+                price_2_btn: 'Mulai Sekarang',
+                price_3_val: 'Rp 18rb<span> / 10.000 req</span>',
+                price_3_btn: 'Hubungi Sales',
+                nav_about: 'Tentang Kami',
+                nav_status: 'Status API',
+                nav_security: 'Keamanan',
+                nav_tos: 'Ketentuan Layanan',
+                footer_copy: '© 2026 ShipStream API Indonesia. Infrastruktur Logistik untuk Perdagangan Modern.'
+            },
+            en: {
+                nav_features: 'Features',
+                nav_pricing: 'Pricing',
+                nav_login: 'Login',
+                nav_cta: 'Register Free',
+                hero_title: 'Elite API for <span style="color: var(--accent);">Modern Logistics</span>',
+                hero_subtitle: 'Single integration for shipping rates, real-time tracking, and national fleet management. Built for the future of package infrastructure.',
+                hero_cta_start: 'Get Started Now',
+                hero_cta_features: 'Learn Features',
+                feat_title: 'Industrial Grade Features',
+                feat_subtitle: 'Forget complicated manual integrations. Use our scale-ready infrastructure.',
+                feat_1_title: 'Unified Logistics Stack',
+                feat_1_desc: 'One endpoint to check rates from dozens of top couriers simultaneously without hassle.',
+                feat_2_title: 'Enterprise Security',
+                feat_2_desc: 'Exclusive with IP Whitelisting, Audit Logs, and robust end-to-end data encryption.',
+                feat_3_title: 'Real-time Webhooks',
+                feat_3_desc: 'Receive package status change notifications (DELIVERED, IN_TRANSIT) directly to your server.',
+                price_title: 'Prepaid Quota Plans',
+                price_subtitle: 'No monthly fees. No minimum commitment. Pay as you go.',
+                price_1_name: 'Starter',
+                price_2_name: 'Growth',
+                price_3_name: 'Enterprise',
+                price_f_1: 'All Courier Access',
+                price_f_2: 'Real-time Tracking',
+                price_f_3: 'Priority Support 24/7',
+                price_f_4: 'Custom Webhook Support',
+                price_btn: 'Select Plan',
+                auth_resend_code: 'Resend Code',
+                auth_wait: 'Wait {s}s',
+                auth_resend_limit: 'Limit reached (3x)',
+                auth_link_back_reg: 'Back to Register',
+                auth_register_title: 'Create Account',
+                auth_login_title: 'Login',
+                auth_verify_title: 'Verify Email',
+                auth_label_user: 'Username',
+                auth_label_user_login: 'Username or Email address',
+                auth_label_email: 'Email Address',
+                auth_label_pass: 'Password',
+                auth_label_otp: 'Verification Code (OTP)',
+                auth_otp_hint: 'Enter the 6-digit code sent to your email.',
+                auth_submit: 'Submit Now',
+                auth_footer_register: 'Already have an account? ',
+                auth_footer_login: 'Don\'t have an account? ',
+                auth_link_login: 'Login here',
+                auth_link_register: 'Register here',
+                toast_server_err: 'Server connection failed.',
+                toast_login_success: 'Login Success! Redirecting...',
+                toast_reg_success: 'Registration success! Check OTP.',
+                toast_reg_fail: 'Registration failed. Please check your details.',
+                toast_verify_success: 'Verification Successful!',
+                toast_verify_error: 'Incorrect or Expired Code',
+                toast_unverified: 'Account not verified. Enter OTP code.',
+                toast_login_fail: 'Incorrect username or password',
+                toast_email_missing: 'Email data missing, please refresh',
+                toast_resend_success: 'New code sent!',
+                toast_resend_error: 'Failed to send code',
+                toast_network_error: 'Network error',
+                toast_error_failed: 'Failed',
+                toast_error_check: 'Check your data',
+                toast_empty_fields: 'Please fill in all required fields',
+                toast_invalid_email: 'Invalid email format',
+                auth_placeholder_user: 'Username',
+                auth_placeholder_pass: 'Password',
+                auth_placeholder_email: 'email@example.com',
+                auth_sending: 'Sending...',
+                alert_limit_reached: 'OTP limit reached. Please refill the registration form.',
+                processing: 'Processing...',
+                stat_uptime: 'System Uptime',
+                stat_latency: 'Node Latency',
+                stat_cities: 'Cities Covered',
+                stat_format: 'Architecture',
+                hero_badge: 'V1.2 INDUSTRIAL SCALE UPDATE',
+                price_1_val: '$0.35<span> / 1.000 req</span>',
+                price_f_minus_webhook: 'No Custom Webhook',
+                price_1_btn: 'Select Starter',
+                price_best_value: 'BEST VALUE',
+                price_2_val: '$0.65<span> / 5.000 req</span>',
+                price_2_btn: 'Start Now',
+                price_3_val: '$1.15<span> / 10.000 req</span>',
+                price_3_btn: 'Contact Sales',
+                nav_about: 'About Us',
+                nav_status: 'API Status',
+                nav_security: 'Security',
+                nav_tos: 'Terms of Service',
+                footer_copy: '© 2026 ShipStream API Indonesia. Powering Logistics for modern commerce.'
+            }
+        };
+
+        let currentLang = localStorage.getItem('pref-lang') || 'en';
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'id' : 'en';
+            localStorage.setItem('pref-lang', currentLang);
+            updateUI();
+        }
+
+        function updateUI() {
+            const flag = document.getElementById('lang-flag');
+            const label = document.getElementById('lang-label');
+            if (currentLang === 'id') {
+                flag.src = 'https://flagcdn.com/w20/id.png';
+                label.innerText = 'ID';
+            } else {
+                flag.src = 'https://flagcdn.com/w20/us.png';
+                label.innerText = 'EN';
+            }
+            updateUILanguage();
+        }
+
+        function t(key) { return translations[currentLang][key] || key; }
+
+        function updateUILanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerHTML = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+        }
+
+        // Modal Logic
+        const modalOverlay = document.getElementById('auth-modal-overlay');
+        const closeBtn = document.getElementById('modal-close-btn');
+
+        function showAuth(mode, keepData = false) {
+            authMode = mode;
+            modalOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+            
+            if (!keepData && mode !== 'verify') {
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('email').value = '';
+            }
+            document.getElementById('otp-code').value = '';
+
+            const titleMap = {
+                'register': 'auth_register_title',
+                'login': 'auth_login_title',
+                'verify': 'auth_verify_title'
+            };
+            const titleEl = document.getElementById('auth-title');
+            titleEl.setAttribute('data-i18n', titleMap[mode]);
+
+            // Dynamic User Label & Placeholder
+            const userLabel = document.querySelector('#username-group label');
+            const userInput = document.getElementById('username');
+            const passInput = document.getElementById('password');
+            if (mode === 'login') {
+                userLabel.setAttribute('data-i18n', 'auth_label_user_login');
+                userInput.setAttribute('data-i18n-placeholder', 'auth_placeholder_user');
+            } else {
+                userLabel.setAttribute('data-i18n', 'auth_label_user');
+                userInput.setAttribute('data-i18n-placeholder', 'auth_placeholder_user');
+            }
+            passInput.setAttribute('data-i18n-placeholder', 'auth_placeholder_pass');
+
+            document.getElementById('username-group').style.display = (mode !== 'verify') ? 'block' : 'none';
+            document.getElementById('email-group').style.display = (mode === 'register') ? 'block' : 'none';
+            document.getElementById('password-group').style.display = (mode !== 'verify') ? 'block' : 'none';
+            document.getElementById('captcha-group').style.display = (mode !== 'verify') ? 'flex' : 'none';
+            document.getElementById('verify-group').style.display = (mode === 'verify') ? 'block' : 'none';
+            document.getElementById('verify-resend-area').style.display = (mode === 'verify') ? 'block' : 'none';
+            
+            const footerToggleWrap = document.getElementById('auth-footer-toggle-wrap');
+            const verifyBackWrap = document.getElementById('verify-back-btn-wrap');
+            const submitBtn = document.getElementById('auth-submit-btn');
+
+            if (mode === 'verify') {
+                footerToggleWrap.style.display = 'none';
+                verifyBackWrap.style.display = 'block';
+            } else {
+                footerToggleWrap.style.display = 'block';
+                verifyBackWrap.style.display = 'none';
+                const footerText = document.getElementById('auth-toggle-text');
+                const toggleBtn = document.getElementById('auth-toggle-btn');
+                footerText.setAttribute('data-i18n', mode === 'register' ? 'auth_footer_register' : 'auth_footer_login');
+                toggleBtn.setAttribute('data-i18n', mode === 'register' ? 'auth_link_login' : 'auth_link_register');
+            }
+            
+            updateUILanguage();
+            lucide.createIcons();
+        }
+
+        function closeAuth() {
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        closeBtn.onclick = closeAuth;
+        modalOverlay.onclick = (e) => { if(e.target === modalOverlay) closeAuth(); };
+
+        // Toast logic
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            const color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            toast.innerHTML = `<i data-lucide="${icon}" style="color: ${color}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Rest of legacy Auth logic
+        // Auth State
+        let authMode = 'register';
+        let regEmail = ''; 
+        let resendTimer = null;
+        let resendCount = 0;
+        let captchaToken = "test-token"; 
+        // window.onCaptchaVerified = (token) => { captchaToken = token; };
+
+        document.getElementById('auth-toggle-btn').onclick = () => {
+            showAuth(authMode === 'register' ? 'login' : 'register');
+        };
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '-eye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+
+            // Simple validation for required fields
+            if (!username || !password || (authMode === 'register' && !email)) {
+                showToast(t('toast_empty_fields'), 'error');
+                return;
+            }
+
+            // Email format validation for register
+            if (authMode === 'register') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showToast(t('toast_invalid_email'), 'error');
+                    return;
+                }
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerText = t('processing');
+
+                if (authMode === 'register') {
+                    const res = await fetch(`${API_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, email, captcha_token: "test-token" })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showToast(t('toast_reg_success'), 'success');
+                        showAuth('verify');
+                        startResendCooldown(60); // Trigger timer immediately
+                    } else {
+                        showToast(t('toast_reg_fail'), 'error');
+                    }
+                } else if (authMode === 'verify') {
+                    const code = document.getElementById('otp-code').value;
+                    const res = await fetch(`${API_URL}/auth/verify-code`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code, channel: 'email', type: 'registration' })
+                    });
+                    if (res.ok) {
+                        showToast(t('toast_verify_success'), 'success');
+                        showAuth('login');
+                    } else {
+                        showToast(t('toast_verify_error'), 'error');
+                    }
+                } else {
+                    const formData = new FormData();
+                    formData.append('username', username || '');
+                    formData.append('password', password || '');
+
+                    const res = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        // headers: { 'X-Captcha-Token': captchaToken },
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        localStorage.setItem('shipstream_token', data.access_token);
+                        localStorage.setItem('shipstream_username', username);
+                        showToast(t('toast_login_success'), 'success');
+                        setTimeout(() => window.location.href = '/dashboard', 1000);
+                    } else {
+                        if (data.detail === "NEED_VERIFICATION") {
+                            showToast(t('toast_unverified'), 'warning');
+                            showAuth('verify');
+                        } else {
+                            showToast(t('toast_login_fail'), 'error');
+                        }
+                    }
+                }
+            } catch (err) {
+                showToast(t('toast_server_err'), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        };
+
+        async function resendRegistrationCode() {
+            const btn = document.getElementById('btn-resend-otp');
+            const cooldownText = document.getElementById('resend-cooldown-text');
+            
+            if (!regEmail) {
+                // Fallback: try to grab from input if visible
+                regEmail = document.getElementById('email').value;
+                if (!regEmail) {
+                    showToast(t('toast_email_missing'), 'error');
+                    return;
+                }
+            }
+
+            try {
+                btn.disabled = true;
+                const oldText = btn.innerText;
+                btn.innerText = t('auth_sending');
+
+                const res = await fetch(`${API_URL}/auth/resend-registration-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: regEmail })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast(data.message || t('toast_resend_success'), 'success');
+                    startResendCooldown(data.next_delay || 60);
+                    resendCount = data.resend_count;
+                } else {
+                    showToast(data.detail || t('toast_resend_error'), 'error');
+                    if (res.status === 429) {
+                        const waitTime = parseInt(data.detail.match(/\d+/)) || 60;
+                        startResendCooldown(waitTime);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                showToast(t('toast_network_error'), 'error');
+            }
+        }
+
+        function startResendCooldown(seconds) {
+            const btn = document.getElementById('btn-resend-otp');
+            const cooldownText = document.getElementById('resend-cooldown-text');
+            const cooldownSpan = cooldownText.querySelector('span');
+
+            if (resendTimer) clearInterval(resendTimer);
+            
+            btn.classList.add('disabled');
+            cooldownText.style.display = 'inline-block';
+            btn.style.display = 'none';
+
+            let count = seconds;
+            const updateUI = () => {
+                cooldownSpan.innerText = t('auth_wait').replace('{s}', count);
+            };
+
+            updateUI();
+            resendTimer = setInterval(() => {
+                count--;
+                if (count <= 0) {
+                    clearInterval(resendTimer);
+                    cooldownText.style.display = 'none';
+                    btn.classList.remove('disabled');
+                    btn.style.display = 'inline-block';
+                    if (resendCount >= 3) {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                        btn.innerText = t('auth_resend_limit');
+                        alert(t('alert_limit_reached'));
+                    }
+                } else {
+                    updateUI();
+                }
+            }, 1000);
+        }
+
+        // Capture email on register
+        document.getElementById('auth-form').addEventListener('submit', () => {
+            if (authMode === 'register') {
+                regEmail = document.getElementById('email').value;
+            }
+        });
+
+        // Handle session terminated redirect dari dashboard (PROMPT D)
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('session') === 'terminated') {
+                // Bersihkan URL tanpa reload
+                history.replaceState({}, '', window.location.pathname);
+                // Tampilkan alert setelah halaman siap
+                setTimeout(() => {
+                    const lang = localStorage.getItem('pref-lang') || 'id';
+                    const msg = lang === 'id'
+                        ? 'Sesi Anda telah diakhiri oleh pemilik akun.'
+                        : 'Your session has been terminated by the account owner.';
+                    if (typeof showToast === 'function') {
+                        showToast(msg, 'error');
+                    } else {
+                        // Fallback jika showToast belum tersedia
+                        const banner = document.createElement('div');
+                        banner.style.cssText = 
+                            'position:fixed;top:16px;right:16px;z-index:9999;' +
+                            'background:#A32D2D;color:#fff;padding:12px 16px;' +
+                            'border-radius:8px;font-size:14px;max-width:320px;';
+                        banner.textContent = msg;
+                        document.body.appendChild(banner);
+                        setTimeout(() => banner.remove(), 4000);
+                    }
+                }, 300);
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
