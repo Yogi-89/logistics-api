@@ -38,8 +38,11 @@ def request_security_otp(
     if current_user.security_last_resend_at:
         hours_passed = (now - current_user.security_last_resend_at).total_seconds() / 3600
         if hours_passed >= 24:
-            current_user.security_resend_count = 0
-            db.commit()
+            try:
+                current_user.security_resend_count = 0
+                db.commit()
+            except Exception:
+                db.rollback()
 
     if current_user.security_resend_count >= 3:
         raise HTTPException(
@@ -70,9 +73,13 @@ def request_security_otp(
     create_verification_code(db, current_user.id, "email", f"security_{target_action}")
     
     # Update Tracking
-    current_user.security_resend_count += 1
-    current_user.security_last_resend_at = now
-    db.commit()
+    try:
+        current_user.security_resend_count += 1
+        current_user.security_last_resend_at = now
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui status keamanan")
 
     return {
         "message": "Kode OTP telah dikirim ke Email Anda.",
@@ -105,9 +112,13 @@ def update_email(
         raise HTTPException(status_code=400, detail="OTP salah atau kedaluwarsa")
 
     # 3. Update Email
-    current_user.email = data.new_email
-    db_code.is_used = True
-    db.commit()
+    try:
+        current_user.email = data.new_email
+        db_code.is_used = True
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui email")
     return {"message": "Email berhasil diubah"}
 
 @router.put("/update-phone")
@@ -134,9 +145,13 @@ def update_phone(
         raise HTTPException(status_code=400, detail="OTP Email salah atau kedaluwarsa")
 
     # 3. Update Phone
-    current_user.phone_number = data.new_phone
-    email_code.is_used = True
-    db.commit()
+    try:
+        current_user.phone_number = data.new_phone
+        email_code.is_used = True
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui nomor HP")
     return {"message": "Nomor HP berhasil diubah"}
 
 @router.put("/update-password")
@@ -170,10 +185,14 @@ def update_password(
         raise HTTPException(status_code=400, detail="OTP Email salah atau kedaluwarsa")
 
     # 3. Update Password
-    current_user.hashed_password = security.get_password_hash(data.new_password)
-    current_user.password_updated_at = datetime.utcnow()
-    email_code.is_used = True
-    db.commit()
+    try:
+        current_user.hashed_password = security.get_password_hash(data.new_password)
+        current_user.password_updated_at = datetime.utcnow()
+        email_code.is_used = True
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui password")
     return {"message": "Password berhasil diperbarui"}
 
 @router.patch("/preferences", response_model=schemas.User)
@@ -201,10 +220,14 @@ def update_preferences(
         if "webhooks" not in new_prefs: new_prefs["webhooks"] = {}
         new_prefs["webhooks"].update(prefs.webhooks)
 
-    current_user.preferences = new_prefs
-    flag_modified(current_user, "preferences")
-    db.commit()
-    db.refresh(current_user)
+    try:
+        current_user.preferences = new_prefs
+        flag_modified(current_user, "preferences")
+        db.commit()
+        db.refresh(current_user)
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal menyimpan preferensi")
     return current_user
 
 @router.post("/test-webhook")
@@ -275,6 +298,10 @@ def revoke_session(
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    session.is_active = False
-    db.commit()
+    try:
+        session.is_active = False
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal mencabut sesi")
     return {"message": "Session revoked successfully"}

@@ -15,8 +15,103 @@ import string
 from datetime import datetime
 import os
 import httpx
+import asyncio
 
 router = APIRouter(prefix="/v1", tags=["Logistics Data (Needs API Key)"])
+
+@router.post("/cost/recommend", response_model=List[schemas.CourierCostRecommendation], summary="Rekomendasi Kurir Termurah")
+@limiter.limit("20/minute")
+async def calculate_recommendations(
+    request: Request,
+    payload: schemas.CostRecommendRequest,
+    db: Session = Depends(get_db),
+    api_key=Depends(validate_api_key)
+):
+    """
+    Menghitung ongkos kirim dari SEMUA kurir yang tersedia dan mengurutkannya dari yang termurah.
+    Menggunakan asyncio.gather untuk performa tinggi (paralel request ke RajaOngkir).
+    """
+    couriers = db.query(models.Courier).all()
+    rajaongkir_key = os.getenv("RAJA_ONGKIR_API_KEY")
+
+    origin_city = db.query(models.City).filter(models.City.id == payload.origin).first()
+    destination_city = db.query(models.City).filter(models.City.id == payload.destination).first()
+
+    if not origin_city or not destination_city:
+        raise HTTPException(status_code=404, detail="Origin or Destination city not found")
+
+    if not origin_city.rajaongkir_id or not destination_city.rajaongkir_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Raja Ongkir ID belum tersedia. Jalankan seed_rajaongkir_ids.py"
+        )
+    
+    # Calculate effective weight (volumetric)
+    volumetric_weight = 0
+    if payload.length and payload.width and payload.height:
+        volumetric_weight = (payload.length * payload.width * payload.height) / 6000 * 1000
+    effective_weight = max(payload.weight, volumetric_weight)
+
+    async def get_single_courier_cost(courier):
+        results = []
+        if rajaongkir_key and rajaongkir_key != "your_raja_ongkir_key_here":
+            try:
+                async with httpx.AsyncClient() as client:
+                    resp = await client.post(
+                        "https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost",
+                        headers={"key": rajaongkir_key},
+                        data={
+                            "origin": str(origin_city.rajaongkir_id),
+                            "destination": str(destination_city.rajaongkir_id),
+                            "weight": int(effective_weight),
+                            "courier": courier.code.lower()
+                        },
+                        timeout=5.0
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        raja_results = data.get("data", [])
+                        for r in raja_results:
+                            results.append({
+                                "courier_name": r.get("name", courier.name),
+                                "courier_code": courier.code,
+                                "service": r.get("service", ""),
+                                "description": r.get("description", ""),
+                                "cost": r.get("cost", 0),
+                                "etd": r.get("etd", "N/A"),
+                                "source": "rajaongkir"
+                            })
+            except Exception:
+                pass
+        
+        if not results:
+            # Internal Fallback
+            weight_kg = effective_weight / 1000
+            # Base price per courier could be different, but for now we use a slightly varied formula
+            base_price = 12000 + (len(courier.name) * 500) 
+            results = [
+                {
+                    "courier_name": courier.name,
+                    "courier_code": courier.code,
+                    "service": "REG",
+                    "cost": int(base_price * weight_kg),
+                    "etd": "2-3 Days",
+                    "source": "internal_fallback"
+                }
+            ]
+        return results
+
+    # Run all requests in parallel
+    tasks = [get_single_courier_cost(c) for c in couriers]
+    all_results_lists = await asyncio.gather(*tasks)
+    
+    # Flatten results
+    final_results = [item for sublist in all_results_lists for item in sublist]
+    
+    # Sort by cost ASC
+    final_results.sort(key=lambda x: x["cost"])
+    
+    return final_results
 
 @router.get("/couriers", response_model=List[schemas.Courier], summary="Daftar Kurir")
 @limiter.limit("60/minute")
@@ -50,6 +145,14 @@ async def calculate_cost(
     if not origin or not destination:
         raise HTTPException(status_code=404, detail="Origin or Destination city not found")
 
+    # Validasi rajaongkir_id tersedia
+    if not origin.rajaongkir_id or not destination.rajaongkir_id:
+        missing_city = origin.name if not origin.rajaongkir_id else destination.name
+        raise HTTPException(
+            status_code=400,
+            detail=f"Raja Ongkir ID belum tersedia untuk kota {missing_city}. Jalankan seed_rajaongkir_ids.py"
+        )
+
     courier = db.query(models.Courier).filter(models.Courier.code == payload.courier).first()
     if not courier:
         raise HTTPException(status_code=404, detail="Courier not found")
@@ -69,11 +172,11 @@ async def calculate_cost(
         try:
             async with httpx.AsyncClient() as client:
                 resp = await client.post(
-                    "https://api.rajaongkir.com/starter/cost",
+                    "https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost",
                     headers={"key": rajaongkir_key},
                     data={
-                        "origin": str(payload.origin),
-                        "destination": str(payload.destination),
+                        "origin": str(origin.rajaongkir_id),
+                        "destination": str(destination.rajaongkir_id),
                         "weight": int(effective_weight),
                         "courier": payload.courier.lower()
                     },
@@ -82,16 +185,15 @@ async def calculate_cost(
                 
                 if resp.status_code == 200:
                     data = resp.json()
-                    raja_results = data.get("rajaongkir", {}).get("results", [])
+                    raja_results = data.get("data", [])
                     for r in raja_results:
-                        for s in r.get("costs", []):
-                            results.append({
-                                "service": s.get("service"),
-                                "description": s.get("description"),
-                                "cost": s.get("cost", [{}])[0].get("value", 0),
-                                "etd": s.get("cost", [{}])[0].get("etd", "N/A"),
-                                "source": "rajaongkir"
-                            })
+                        results.append({
+                            "service": r.get("service"),
+                            "description": r.get("description", ""),
+                            "cost": r.get("cost", 0),
+                            "etd": r.get("etd", "N/A"),
+                            "source": "rajaongkir"
+                        })
         except Exception:
             pass
 
@@ -165,9 +267,13 @@ def create_shipment(
         }]
     )
     
-    db.add(new_tracking)
-    db.commit()
-    db.refresh(new_tracking)
+    try:
+        db.add(new_tracking)
+        db.commit()
+        db.refresh(new_tracking)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Gagal membuat shipment: {str(e)}")
     
     return {
         "status": "success",
@@ -229,11 +335,14 @@ def update_tracking_status(
         "note": note
     })
     
-    track.status = status
-    track.history = new_history
-    track.last_updated = datetime.utcnow()
-    
-    db.commit()
+    try:
+        track.status = status
+        track.history = new_history
+        track.last_updated = datetime.utcnow()
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui status tracking")
     return {"status": "success", "current_status": status}
 
 @router.get("/label/{awb}", summary="Generate Shipping Label (PDF)", description="Menghasilkan label pengiriman (Shipping Label) standar industri dalam format PDF untuk dicetak.")
@@ -283,10 +392,18 @@ def get_shipping_label(
     pdf.set_auto_page_break(auto=True, margin=10)
     
     # 1. Header Section
+    # Add Logo
+    logo_path = os.path.join("frontend", "assets", "logo_icon_white_modern_blue-removebg-preview.png")
+    if os.path.exists(logo_path):
+        pdf.image(logo_path, 10, 8, 12) # x=10, y=8, width=12mm
+    
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, L["title"], 0, 1, "C")
+    pdf.set_xy(25, 8) # Offset title to the right of the logo
+    pdf.cell(0, 10, L["title"], 0, 1, "L")
+    
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(0, 5, L["subtitle"], 0, 1, "C")
+    pdf.set_xy(25, 16)
+    pdf.cell(0, 5, L["subtitle"], 0, 1, "L")
     pdf.ln(5)
     
     # Draw Line

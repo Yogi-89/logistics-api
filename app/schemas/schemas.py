@@ -101,6 +101,22 @@ class CostRequest(BaseModel):
     width: Optional[int] = Field(None, gt=0, le=300)
     height: Optional[int] = Field(None, gt=0, le=300)
 
+class CostRecommendRequest(BaseModel):
+    origin: int
+    destination: int
+    weight: int = Field(..., gt=0, le=70000)
+    length: Optional[int] = Field(None, gt=0, le=300)
+    width: Optional[int] = Field(None, gt=0, le=300)
+    height: Optional[int] = Field(None, gt=0, le=300)
+
+class CourierCostRecommendation(BaseModel):
+    courier_name: str
+    courier_code: str
+    service: str
+    cost: int
+    etd: str
+    source: str
+
 class TrackingHistory(BaseModel):
     status: str
     location: str

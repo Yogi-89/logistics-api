@@ -60,6 +60,7 @@ class City(Base):
     province = Column(String)
     type = Column(String) # Kota, Kabupaten
     postal_code = Column(String)
+    rajaongkir_id = Column(Integer, nullable=True)
 
     subdistricts = relationship("Subdistrict", back_populates="city")
 

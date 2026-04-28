@@ -123,3 +123,20 @@
 - Refaktor flow login/register agar menggunakan JSON-based request + `X-Captcha-Token` header.
 - Status bridge.md: `[x] DONE`
 
+### 2026-04-25 — Phase 2: Scale Up & Deploy (Antigravity)
+**TODO 1**: Global Exception Handler & DB Audit
+- Implementasi `@app.exception_handler(Exception)` di `main.py` untuk menjamin response selalu JSON.
+- Audit & Wrap `db.commit()` di semua router (`auth`, `logistics`, `apikey`, `billing`, `profile`) dengan `try/except` + `db.rollback()`.
+- Status: `[x] DONE`
+
+**TODO 2**: Enterprise Cost Recommendation
+- Implementasi `POST /v1/cost/recommend` di `logistics.py`.
+- Menggunakan `asyncio.gather` untuk fetch ongkir dari semua kurir secara paralel (High Performance).
+- Tambah schema `CostRecommendRequest` dan `CourierCostRecommendation` di `schemas.py`.
+- Status: `[x] DONE`
+
+**TODO 3**: Railway Deployment Readiness
+- Buat `Procfile` dan `railway.toml` untuk konfigurasi deployment.
+- Refaktor CORS di `main.py` agar mendukung `ALLOWED_ORIGINS` dari environment variable.
+- Status: `[x] DONE`
+

@@ -23,9 +23,13 @@ def generate_key(key_data: schemas.APIKeyCreate, current_user: models.User = Dep
         user_id=current_user.id,
         request_limit=key_data.request_limit # Optional sub-limit
     )
-    db.add(new_key)
-    db.commit()
-    db.refresh(new_key)
+    try:
+        db.add(new_key)
+        db.commit()
+        db.refresh(new_key)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal generate API Key")
     return new_key
 
 @router.put("/{key_id}/settings", response_model=schemas.APIKey)
@@ -46,8 +50,12 @@ def update_key_settings(key_id: int, settings: schemas.APIKeyUpdate, current_use
     if settings.is_active is not None:
         key.is_active = settings.is_active
         
-    db.commit()
-    db.refresh(key)
+    try:
+        db.commit()
+        db.refresh(key)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui pengaturan API Key")
     return key
 
 @router.get("/list", response_model=List[schemas.APIKey])
@@ -60,9 +68,12 @@ def revoke_key(key_id: int, current_user: models.User = Depends(get_current_user
     if not key:
         raise HTTPException(status_code=404, detail="API Key not found or unauthorized")
     
-    # Nullify references in transactions before deletion
-    db.query(models.Transaction).filter(models.Transaction.api_key_id == key_id).update({models.Transaction.api_key_id: None})
-    
-    db.delete(key)
-    db.commit()
+    try:
+        # Nullify references in transactions before deletion
+        db.query(models.Transaction).filter(models.Transaction.api_key_id == key_id).update({models.Transaction.api_key_id: None})
+        db.delete(key)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal menghapus API Key")
     return {"message": "API Key revoked successfully"}

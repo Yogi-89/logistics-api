@@ -10,7 +10,34 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="assets/logo_icon_dark_modern_blue-removebg-preview.png">
     <style>
+        @keyframes splashAnim {
+            0% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0px #00d2ff);
+                transform: scale(0.9);
+            }
+
+            40% {
+                opacity: 1;
+                filter: drop-shadow(0 0 20px #00d2ff);
+                transform: scale(1);
+            }
+
+            80% {
+                opacity: 1;
+                filter: drop-shadow(0 0 10px #00d2ff);
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0px #00d2ff);
+                transform: scale(1.1);
+            }
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -188,10 +215,19 @@
 </head>
 
 <body>
+    <!-- Splash Screen -->
+    <div id="splash"
+        style="position:fixed;inset:0;background:#0b0d11;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.6s ease">
+        <img src="assets/logo_icon_white_modern_blue-removebg-preview.png"
+            style="width:280px;height:280px;object-fit:contain;animation:splashAnim 3s ease forwards;">
+    </div> 
     <div id="toast-container"></div>
     <div class="container-fluid">
         <nav class="navbar-main">
-            <div class="logo">SHIPSTREAM <span style="font-size: 0.8rem; opacity: 0.5;">DASHBOARD</span></div>
+            <div class="logo">
+                <img src="assets/navbar_footer_dark_modern_blue-removebg-preview.png" alt="ShipStream"
+                    style="height: 36px; width: auto; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));">
+            </div>
             <div id="user-info" style="display: flex; align-items: center; gap: 1.5rem;">
                 <div id="global-quota-header"
                     style="text-align: right; background: rgba(59, 130, 246, 0.1); padding: 0.25rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(59, 130, 246, 0.2);">
@@ -236,472 +272,517 @@
                             <h2 data-i18n="keys_title">API Key Management</h2>
                             <p data-i18n="keys_desc">Manage your keys to access logistics data.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="showGenerateModal()" data-i18n="btn_create_key">+ Buat Key Baru</button>
+                        <button class="btn btn-primary" onclick="showGenerateModal()" data-i18n="btn_create_key">+ Buat
+                            Key Baru</button>
                     </div>
 
                     <div style="max-width: 1200px; margin: 0 auto;">
 
-                    <div id="global-usage-widget" class="glass"
-                        style="padding: 1.5rem; margin-bottom: 2rem; border-left: 4px solid var(--accent); background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div id="global-usage-widget" class="glass"
+                            style="padding: 1.5rem; margin-bottom: 2rem; border-left: 4px solid var(--accent); background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                                 <div>
                                     <h3 style="font-size: 1rem; margin-bottom: 0.25rem;" data-i18n="keys_usage_title">
                                         Request yang bisa digunakan</h3>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);" data-i18n="keys_pool_hint">
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);"
+                                        data-i18n="keys_pool_hint">
                                         Semua API Key Anda berbagi kuota prepaid ini.</p>
                                 </div>
                                 <div style="text-align: right; display: flex; align-items: center; gap: 1.25rem;">
-                                    <button class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);" onclick="showTopupModal()">
+                                    <button class="btn btn-primary"
+                                        style="padding: 0.6rem 1.25rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);"
+                                        onclick="showTopupModal()">
                                         <i data-lucide="zap" style="width: 16px; height: 16px; fill: currentColor;"></i>
                                         <span data-i18n="btn_topup">Top Up</span>
                                     </button>
                                     <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1;" id="global-usage-text">0</div>
-                                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">Available</div>
+                                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1;"
+                                            id="global-usage-text">0</div>
+                                        <div
+                                            style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">
+                                            Available</div>
                                     </div>
                                 </div>
                             </div>
-                        <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
-                            <div id="global-usage-bar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px var(--accent-glow);"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-secondary); font-weight: 500;">
-                            <span id="global-usage-percent-text">Used: 0%</span>
-                            <span id="global-usage-limit-text">Pool Limit: 0</span>
-                        </div>
-                    </div>
-
-                    <div id="keys-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <p style="color: var(--text-secondary);" data-i18n="keys_loading">Loading keys...</p>
-                    </div>
-
-                    <div class="glass" style="margin-top: 3rem; padding: 2rem;">
-                        <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="terminal" style="color: var(--accent);"></i>
-                            <span data-i18n="keys_example_title">Contoh Penggunaan Cepat</span>
-                        </h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;"
-                            data-i18n="keys_example_desc">
-                            Gunakan salah satu API Key Anda di header X-API-Key. Jasa layanan kami meliputi:
-                        </p>
-                        <div
-                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; font-size: 0.85rem;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
-                                <i data-lucide="check-circle"
-                                    style="width: 14px; height: 14px; color: var(--success);"></i> <span
-                                    data-i18n="keys_feature_cities">Daftar Kota & Kurir Lengkap</span>
+                            <div
+                                style="width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                                <div id="global-usage-bar"
+                                    style="width: 0%; height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px var(--accent-glow);">
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
-                                <i data-lucide="check-circle"
-                                    style="width: 14px; height: 14px; color: var(--success);"></i> <span
-                                    data-i18n="keys_feature_cost">Kalkulasi Ongkir Akurat</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
-                                <i data-lucide="check-circle"
-                                    style="width: 14px; height: 14px; color: var(--success);"></i> <span
-                                    data-i18n="keys_feature_tracking">Tracking Resi Real-time</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
-                                <i data-lucide="check-circle"
-                                    style="width: 14px; height: 14px; color: var(--success);"></i> <span
-                                    data-i18n="keys_feature_easy">Integrasi Mudah (REST API)</span>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-secondary); font-weight: 500;">
+                                <span id="global-usage-percent-text">Used: 0%</span>
+                                <span id="global-usage-limit-text">Pool Limit: 0</span>
                             </div>
                         </div>
 
-                        <div style="position: relative;">
-                            <pre style="background: #0b0e14; padding: 1.25rem 3.5rem 1.25rem 1.25rem; border-radius: 0.75rem; color: #10b981; overflow-x: auto; border: 1px solid var(--border-color); font-family: 'Fira Code', monospace; line-height: 1.5;"
-                                id="curl-example">
+                        <div id="keys-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <p style="color: var(--text-secondary);" data-i18n="keys_loading">Loading keys...</p>
+                        </div>
+
+                        <div class="glass" style="margin-top: 3rem; padding: 2rem;">
+                            <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="terminal" style="color: var(--accent);"></i>
+                                <span data-i18n="keys_example_title">Contoh Penggunaan Cepat</span>
+                            </h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;"
+                                data-i18n="keys_example_desc">
+                                Gunakan salah satu API Key Anda di header X-API-Key. Jasa layanan kami meliputi:
+                            </p>
+                            <div
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; font-size: 0.85rem;">
+                                <div
+                                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                                    <i data-lucide="check-circle"
+                                        style="width: 14px; height: 14px; color: var(--success);"></i> <span
+                                        data-i18n="keys_feature_cities">Daftar Kota & Kurir Lengkap</span>
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                                    <i data-lucide="check-circle"
+                                        style="width: 14px; height: 14px; color: var(--success);"></i> <span
+                                        data-i18n="keys_feature_cost">Kalkulasi Ongkir Akurat</span>
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                                    <i data-lucide="check-circle"
+                                        style="width: 14px; height: 14px; color: var(--success);"></i> <span
+                                        data-i18n="keys_feature_tracking">Tracking Resi Real-time</span>
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                                    <i data-lucide="check-circle"
+                                        style="width: 14px; height: 14px; color: var(--success);"></i> <span
+                                        data-i18n="keys_feature_easy">Integrasi Mudah (REST API)</span>
+                                </div>
+                            </div>
+
+                            <div style="position: relative;">
+                                <pre style="background: #0b0e14; padding: 1.25rem 3.5rem 1.25rem 1.25rem; border-radius: 0.75rem; color: #10b981; overflow-x: auto; border: 1px solid var(--border-color); font-family: 'Fira Code', monospace; line-height: 1.5;"
+                                    id="curl-example">
 curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pre>
-                            <button onclick="copyExample()"
-                                style="position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; padding: 0.5rem; border-radius: 0.5rem;"
-                                class="btn-outline" title="Copy to clipboard">
-                                <i data-lucide="copy" style="width: 18px; height: 18px;"></i>
-                            </button>
+                                <button onclick="copyExample()"
+                                    style="position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; padding: 0.5rem; border-radius: 0.5rem;"
+                                    class="btn-outline" title="Copy to clipboard">
+                                    <i data-lucide="copy" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
                 <!-- Documentation Tab -->
                 <div id="tab-docs" style="display: none;">
-                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="docs_title">Dokumentasi API</h2>
+                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="docs_title">
+                        Dokumentasi API</h2>
 
                     <div style="max-width: 1200px; margin: 0 auto;">
                         <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
                             <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="shield-check" style="color: var(--accent);"></i>
-                            <span data-i18n="docs_guide_title">Panduan Integrasi Universal</span>
-                        </h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;" data-i18n="docs_guide_desc">
-                            Semua request ke API v1 harus menyertakan header autentikasi berikut untuk validasi akses
-                            dan tracking kuota.</p>
+                                <i data-lucide="shield-check" style="color: var(--accent);"></i>
+                                <span data-i18n="docs_guide_title">Panduan Integrasi Universal</span>
+                            </h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;" data-i18n="docs_guide_desc">
+                                Semua request ke API v1 harus menyertakan header autentikasi berikut untuk validasi
+                                akses
+                                dan tracking kuota.</p>
 
-                        <div
-                            style="background: rgba(0,0,0,0.2); border-radius: 0.75rem; padding: 1.25rem; border: 1px solid var(--border-color);">
-                            <table class="doc-table" style="width: 100%; font-size: 0.9rem;">
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                    <td style="padding: 0.5rem 0; color: var(--text-primary); font-weight: 600; width: 120px;"
-                                        data-i18n="docs_table_header">Header</td>
-                                    <td style="padding: 0.5rem 0; color: var(--text-primary); font-weight: 600;"
-                                        data-i18n="docs_table_value">Nilai</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.75rem 0;"><code>X-API-Key</code></td>
-                                    <td style="padding: 0.75rem 0; color: var(--success);" data-i18n="docs_val_apikey">
-                                        API Key Anda yang aktif (Dihasilkan dari Dashboard)</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.75rem 0;"><code>Content-Type</code></td>
-                                    <td style="padding: 0.75rem 0; color: var(--text-secondary);">application/json</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="alert-triangle" style="color: var(--danger);"></i>
-                            <span data-i18n="docs_error_title">Error & Troubleshooting</span>
-                        </h3>
-                        <div style="display: grid; gap: 1rem;">
                             <div
-                                style="display: flex; gap: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border-radius: 0.5rem;">
-                                <b style="color: var(--danger); min-width: 40px;">401</b>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
-                                        data-i18n="docs_error_401_code">Unauthorized</b>: <span
-                                        data-i18n="docs_error_401">API Key salah, tidak aktif, atau tidak dikirim dalam
-                                        header.</span></span>
-                            </div>
-                            <div
-                                style="display: flex; gap: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border-radius: 0.5rem;">
-                                <b style="color: var(--danger); min-width: 40px;">403</b>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
-                                        data-i18n="docs_error_403_code">Forbidden</b>: <span
-                                        data-i18n="docs_error_403">IP Address pengirim tidak terdaftar dalam Whitelist
-                                        API Key tersebut.</span></span>
-                            </div>
-                            <div
-                                style="display: flex; gap: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.05); border-radius: 0.5rem;">
-                                <b style="color: var(--accent); min-width: 40px;">429</b>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
-                                        data-i18n="docs_error_429_code">Too Many Requests</b>: <span
-                                        data-i18n="docs_error_429">Kuota (Prepaid Limit) sudah habis. Silakan top-up
-                                        atau naikkan limit.</span></span>
+                                style="background: rgba(0,0,0,0.2); border-radius: 0.75rem; padding: 1.25rem; border: 1px solid var(--border-color);">
+                                <table class="doc-table" style="width: 100%; font-size: 0.9rem;">
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 0.5rem 0; color: var(--text-primary); font-weight: 600; width: 120px;"
+                                            data-i18n="docs_table_header">Header</td>
+                                        <td style="padding: 0.5rem 0; color: var(--text-primary); font-weight: 600;"
+                                            data-i18n="docs_table_value">Nilai</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem 0;"><code>X-API-Key</code></td>
+                                        <td style="padding: 0.75rem 0; color: var(--success);"
+                                            data-i18n="docs_val_apikey">
+                                            API Key Anda yang aktif (Dihasilkan dari Dashboard)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem 0;"><code>Content-Type</code></td>
+                                        <td style="padding: 0.75rem 0; color: var(--text-secondary);">application/json
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="layers" style="color: var(--accent);"></i>
-                            <span data-i18n="docs_endpoints_title">Endpoint Tersedia</span>
-                        </h3>
-
-                        <div style="display: flex; flex-direction: column; gap: 2rem;">
-                            <!-- Cities -->
-                            <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <span
-                                        style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
-                                    <code style="color: var(--text-primary); font-weight: 600;">/v1/cities</code>
-                                </div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
-                                    data-i18n="docs_endpoint_cities">Mengambil daftar kota operasional lengkap dengan
-                                    <b>Provinsi, Kode Pos, dan Tipe (Kota/Kab)</b>.</p>
+                        <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="alert-triangle" style="color: var(--danger);"></i>
+                                <span data-i18n="docs_error_title">Error & Troubleshooting</span>
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
                                 <div
-                                    style="font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 0.5rem; color: var(--text-secondary);">
-                                    <b data-i18n="docs_endpoint_surabaya">Contoh Response:</b>
-                                    <code>[{"id": 6, "name": "Surabaya", "postal_code": "60111", ...}]</code>
+                                    style="display: flex; gap: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border-radius: 0.5rem;">
+                                    <b style="color: var(--danger); min-width: 40px;">401</b>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
+                                            data-i18n="docs_error_401_code">Unauthorized</b>: <span
+                                            data-i18n="docs_error_401">API Key salah, tidak aktif, atau tidak dikirim
+                                            dalam
+                                            header.</span></span>
                                 </div>
-                            </div>
-
-                            <!-- Couriers -->
-                            <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <span
-                                        style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
-                                    <code style="color: var(--text-primary); font-weight: 600;">/v1/couriers</code>
-                                </div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
-                                    data-i18n="docs_endpoint_couriers">Mengambil daftar kurir yang didukung (JNE, J&T,
-                                    SiCepat, dll) beserta <b>Logo & Deskripsi</b> layanan.</p>
-                            </div>
-
-                            <!-- Cost -->
-                            <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <span
-                                        style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
-                                    <code style="color: var(--text-primary); font-weight: 600;">/v1/cost</code>
-                                </div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
-                                    data-i18n="docs_endpoint_cost">Cek tarif berdasar rute. Wajib mengirim query param:
-                                    <code>origin_id</code>, <code>destination_id</code>, <code>courier_code</code>.</p>
                                 <div
-                                    style="font-size: 0.8rem; background: rgba(16, 185, 129, 0.05); border-left: 3px solid var(--success); padding: 0.75rem; color: var(--text-secondary);">
-                                    <span data-i18n="docs_endpoint_cost_res">Mengembalikan JSON berisi estimasi harga
-                                        dan waktu (ETD) untuk berbagai tipe layanan (REG, YES, OKE).</span>
+                                    style="display: flex; gap: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border-radius: 0.5rem;">
+                                    <b style="color: var(--danger); min-width: 40px;">403</b>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
+                                            data-i18n="docs_error_403_code">Forbidden</b>: <span
+                                            data-i18n="docs_error_403">IP Address pengirim tidak terdaftar dalam
+                                            Whitelist
+                                            API Key tersebut.</span></span>
                                 </div>
-                            </div>
-
-                            <!-- Tracking -->
-                            <div>
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <span
-                                        style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
-                                    <code
-                                        style="color: var(--text-primary); font-weight: 600;">/v1/tracking/{awb}</code>
+                                <div
+                                    style="display: flex; gap: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.05); border-radius: 0.5rem;">
+                                    <b style="color: var(--accent); min-width: 40px;">429</b>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);"><b
+                                            data-i18n="docs_error_429_code">Too Many Requests</b>: <span
+                                            data-i18n="docs_error_429">Kuota (Prepaid Limit) sudah habis. Silakan top-up
+                                            atau naikkan limit.</span></span>
                                 </div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
-                                    data-i18n="docs_endpoint_tracking">Pantau status paket secara <b>Real-time</b>.
-                                    Masukkan nomor Resi (AWB) pada path parameter. Mendukung fitur <b>Cetak Label
-                                        Pengiriman (PDF)</b> melalui endpoint terpisah.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="play" style="color: var(--success);"></i>
-                            <span data-i18n="docs_playground_title">Playground Layanan Interaktif</span>
-                        </h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;"
-                            data-i18n="docs_playground_desc">
-                            Coba layanan kami secara langsung menggunakan API Key Anda. Pilih aksi di bawah ini untuk
-                            melihat hasil integrasi.
-                        </p>
-
-                        <div id="playground-key-group" style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;" data-i18n="label_playground_key">API Key untuk Test</label>
-                            <div id="playground-key-select-container">
-                                <!-- Dropdown will be injected here -->
-                                <div class="select-wrapper has-icon-left">
-                                    <i data-lucide="key" class="select-icon-left"></i>
-                                    <select id="playground-key-select">
-                                        <option value="" disabled selected>Memuat kunci...</option>
-                                    </select>
-                                    <i data-lucide="chevron-down"></i>
-                                </div>
-                            </div>
-                            <div id="playground-no-key-msg" style="display: none; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 0.75rem; font-size: 0.85rem; color: var(--text-secondary);">
-                                <i data-lucide="alert-triangle" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 8px; color: var(--danger);"></i>
-                                Anda belum memiliki API Key aktif. <a href="javascript:switchTab('keys')" style="color: var(--accent); font-weight: 600; text-decoration: none;">Buat key baru di tab Keys.</a>
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                            <button class="btn btn-outline" onclick="preparePlayground('cities')"
-                                data-i18n="docs_btn_cities">Test List Cities</button>
-                            <button class="btn btn-outline" onclick="preparePlayground('couriers')"
-                                data-i18n="docs_btn_couriers">Test List Couriers</button>
-                            <button class="btn btn-outline" onclick="preparePlayground('cost')"
-                                data-i18n="docs_btn_cost">Test Check Cost</button>
-                            <button class="btn btn-outline" onclick="preparePlayground('track')"
-                                data-i18n="docs_btn_track">Test Track Resi</button>
-                        </div>
+                        <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="layers" style="color: var(--accent);"></i>
+                                <span data-i18n="docs_endpoints_title">Endpoint Tersedia</span>
+                            </h3>
 
-                        <!-- Playground Inputs -->
-                        <div id="play-inputs-container" style="display: none; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem;">
-                            <div id="play-group-track" style="display: none;">
-                                <div class="form-group" style="margin-bottom: 1rem;">
-                                    <label data-i18n="docs_label_awb">Masukkan Nomor Resi (AWB)</label>
-                                    <input type="text" id="play-awb" value="LGS-12345678" placeholder="Contoh: LGS-12345678">
-                                </div>
-                            </div>
-                            <div id="play-group-cost" style="display: none;">
-                                <div class="grid-2-col" style="margin-bottom: 1rem;">
-                                    <div class="form-group">
-                                        <label data-i18n="docs_label_origin">ID Kota Asal</label>
-                                        <input type="number" id="play-origin" value="1">
+                            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                                <!-- Cities -->
+                                <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                                    <div
+                                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                        <span
+                                            style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
+                                        <code style="color: var(--text-primary); font-weight: 600;">/v1/cities</code>
                                     </div>
-                                    <div class="form-group">
-                                        <label data-i18n="docs_label_dest">ID Kota Tujuan</label>
-                                        <input type="number" id="play-dest" value="2">
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
+                                        data-i18n="docs_endpoint_cities">Mengambil daftar kota operasional lengkap
+                                        dengan
+                                        <b>Provinsi, Kode Pos, dan Tipe (Kota/Kab)</b>.
+                                    </p>
+                                    <div
+                                        style="font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 0.5rem; color: var(--text-secondary);">
+                                        <b data-i18n="docs_endpoint_surabaya">Contoh Response:</b>
+                                        <code>[{"id": 6, "name": "Surabaya", "postal_code": "60111", ...}]</code>
                                     </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 1rem;">
-                                    <label data-i18n="docs_label_weight">Berat (Gram)</label>
-                                    <input type="number" id="play-weight" value="1000">
+
+                                <!-- Couriers -->
+                                <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                                    <div
+                                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                        <span
+                                            style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
+                                        <code style="color: var(--text-primary); font-weight: 600;">/v1/couriers</code>
+                                    </div>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
+                                        data-i18n="docs_endpoint_couriers">Mengambil daftar kurir yang didukung (JNE,
+                                        J&T,
+                                        SiCepat, dll) beserta <b>Logo & Deskripsi</b> layanan.</p>
+                                </div>
+
+                                <!-- Cost -->
+                                <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                                    <div
+                                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                        <span
+                                            style="background: #3b82f6; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">POST</span>
+                                        <code style="color: var(--text-primary); font-weight: 600;">/v1/cost</code>
+                                    </div>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
+                                        data-i18n="docs_endpoint_cost">Cek tarif berdasar rute. Wajib mengirim JSON body:
+                                        <code>origin</code>, <code>destination</code>, <code>courier</code>, <code>weight</code>.
+                                    </p>
+                                    <div
+                                        style="font-size: 0.8rem; background: rgba(16, 185, 129, 0.05); border-left: 3px solid var(--success); padding: 0.75rem; color: var(--text-secondary);">
+                                        <span data-i18n="docs_endpoint_cost_res">Mengembalikan JSON berisi estimasi
+                                            harga
+                                            dan waktu (ETD) untuk berbagai tipe layanan (REG, YES, OKE).</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tracking -->
+                                <div>
+                                    <div
+                                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                        <span
+                                            style="background: #10b981; color: #fff; padding: 0.2rem 0.6rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800;">GET</span>
+                                        <code
+                                            style="color: var(--text-primary); font-weight: 600;">/v1/tracking/{awb}</code>
+                                    </div>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;"
+                                        data-i18n="docs_endpoint_tracking">Pantau status paket secara <b>Real-time</b>.
+                                        Masukkan nomor Resi (AWB) pada path parameter. Mendukung fitur <b>Cetak Label
+                                            Pengiriman (PDF)</b> melalui endpoint terpisah.</p>
                                 </div>
                             </div>
-                            <button class="btn btn-primary" onclick="executePlayground()" style="width: 100%;">
-                                <i data-lucide="play" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
-                                <span data-i18n="btn_run_test">Jalankan Test</span>
-                            </button>
                         </div>
 
-                        <div id="play-result-container" style="display: none; margin-top: 1.5rem;">
-                            <div
-                                style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                                <span data-i18n="docs_output">Response Output:</span>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <button id="play-download-label" class="btn btn-primary"
-                                        style="display: none; padding: 0.3rem 0.8rem; font-size: 0.7rem; gap: 5px;">
-                                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
-                                        <span data-i18n="btn_download_label">Download Shipping Label</span>
-                                    </button>
-                                    <span id="play-endpoint" style="color: var(--accent);"></span>
+                        <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="play" style="color: var(--success);"></i>
+                                <span data-i18n="docs_playground_title">Playground Layanan Interaktif</span>
+                            </h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;"
+                                data-i18n="docs_playground_desc">
+                                Coba layanan kami secara langsung menggunakan API Key Anda. Pilih aksi di bawah ini
+                                untuk
+                                melihat hasil integrasi.
+                            </p>
+
+                            <div id="playground-key-group" style="margin-bottom: 1.5rem;">
+                                <label
+                                    style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;"
+                                    data-i18n="label_playground_key">API Key untuk Test</label>
+                                <div id="playground-key-select-container">
+                                    <!-- Dropdown will be injected here -->
+                                    <div class="select-wrapper has-icon-left">
+                                        <i data-lucide="key" class="select-icon-left"></i>
+                                        <select id="playground-key-select">
+                                            <option value="" disabled selected>Memuat kunci...</option>
+                                        </select>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                </div>
+                                <div id="playground-no-key-msg"
+                                    style="display: none; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 0.75rem; font-size: 0.85rem; color: var(--text-secondary);">
+                                    <i data-lucide="alert-triangle"
+                                        style="width: 16px; height: 16px; vertical-align: middle; margin-right: 8px; color: var(--danger);"></i>
+                                    Anda belum memiliki API Key aktif. <a href="javascript:switchTab('keys')"
+                                        style="color: var(--accent); font-weight: 600; text-decoration: none;">Buat key
+                                        baru di tab Keys.</a>
                                 </div>
                             </div>
-                            <pre id="play-result"
-                                style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); color: #10b981; font-size: 0.8rem; max-height: 250px; overflow-y: auto; font-family: monospace;"></pre>
-                        </div>
-                    </div>
 
-                    <div class="glass" style="padding: 2rem; margin-top: 2rem;">
-                        <h3 style="margin-bottom: 1rem;" data-i18n="docs_full_title">Dokumentasi Lengkap</h3>
-                        <p style="color: var(--text-secondary);" data-i18n="docs_full_desc">Untuk dokumentasi lengkap
-                            dan testing interaktif (Auto-generated):</p>
-                        <a id="swagger-link" href="/docs" target="_blank" class="btn btn-primary"
-                            style="display: inline-block; margin-top: 1rem;" data-i18n="btn_swagger">Open Swagger UI
-                            →</a>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                                <button class="btn btn-outline" onclick="preparePlayground('cities')"
+                                    data-i18n="docs_btn_cities">Test List Cities</button>
+                                <button class="btn btn-outline" onclick="preparePlayground('couriers')"
+                                    data-i18n="docs_btn_couriers">Test List Couriers</button>
+                                <button class="btn btn-outline" onclick="preparePlayground('cost')"
+                                    data-i18n="docs_btn_cost">Test Check Cost</button>
+                                <button class="btn btn-outline" onclick="preparePlayground('track')"
+                                    data-i18n="docs_btn_track">Test Track Resi</button>
+                            </div>
+
+                            <!-- Playground Inputs -->
+                            <div id="play-inputs-container"
+                                style="display: none; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+                                <div id="play-group-track" style="display: none;">
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label data-i18n="docs_label_awb">Masukkan Nomor Resi (AWB)</label>
+                                        <input type="text" id="play-awb" value="LGS-12345678"
+                                            placeholder="Contoh: LGS-12345678">
+                                    </div>
+                                </div>
+                                <div id="play-group-cost" style="display: none;">
+                                    <div class="grid-2-col" style="margin-bottom: 1rem;">
+                                        <div class="form-group">
+                                            <label data-i18n="docs_label_origin">ID Kota Asal</label>
+                                            <input type="number" id="play-origin" value="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label data-i18n="docs_label_dest">ID Kota Tujuan</label>
+                                            <input type="number" id="play-dest" value="2">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label data-i18n="docs_label_weight">Berat (Gram)</label>
+                                        <input type="number" id="play-weight" value="1000">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="executePlayground()" style="width: 100%;">
+                                    <i data-lucide="play" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <span data-i18n="btn_run_test">Jalankan Test</span>
+                                </button>
+                            </div>
+
+                            <div id="play-result-container" style="display: none; margin-top: 1.5rem;">
+                                <div
+                                    style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <span data-i18n="docs_output">Response Output:</span>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <button id="play-download-label" class="btn btn-primary"
+                                            style="display: none; padding: 0.3rem 0.8rem; font-size: 0.7rem; gap: 5px;">
+                                            <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                                            <span data-i18n="btn_download_label">Download Shipping Label</span>
+                                        </button>
+                                        <span id="play-endpoint" style="color: var(--accent);"></span>
+                                    </div>
+                                </div>
+                                <pre id="play-result"
+                                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); color: #10b981; font-size: 0.8rem; max-height: 250px; overflow-y: auto; font-family: monospace;"></pre>
+                            </div>
+                        </div>
+
+                        <div class="glass" style="padding: 2rem; margin-top: 2rem;">
+                            <h3 style="margin-bottom: 1rem;" data-i18n="docs_full_title">Dokumentasi Lengkap</h3>
+                            <p style="color: var(--text-secondary);" data-i18n="docs_full_desc">Untuk dokumentasi
+                                lengkap
+                                dan testing interaktif (Auto-generated):</p>
+                            <a id="swagger-link" href="/docs" target="_blank" class="btn btn-primary"
+                                style="display: inline-block; margin-top: 1rem;" data-i18n="btn_swagger">Open Swagger UI
+                                →</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Settings Tab -->
                 <div id="tab-settings" style="display: none; padding-top: 2rem;">
-                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="settings_title">Settings</h2>
+                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;"
+                        data-i18n="settings_title">Settings</h2>
 
                     <div class="responsive-grid">
                         <!-- Language & Regional -->
-                            <div class="glass" style="padding: 2rem;">
-                                <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i data-lucide="globe" style="color: var(--accent);"></i>
-                                    <span data-i18n="sec_language">Language & Regional</span>
-                                </h3>
-                                <div class="form-group">
-                                    <label data-i18n="label_lang">App Language</label>
-                                    <div class="select-wrapper">
-                                        <select id="pref-lang">
-                                            <option value="id" data-i18n="lang_id">Bahasa Indonesia</option>
-                                            <option value="en" data-i18n="lang_en">English (US)</option>
-                                        </select>
-                                        <i data-lucide="chevron-down"></i>
-                                    </div>
+                        <div class="glass" style="padding: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="globe" style="color: var(--accent);"></i>
+                                <span data-i18n="sec_language">Language & Regional</span>
+                            </h3>
+                            <div class="form-group">
+                                <label data-i18n="label_lang">App Language</label>
+                                <div class="select-wrapper">
+                                    <select id="pref-lang">
+                                        <option value="id" data-i18n="lang_id">Bahasa Indonesia</option>
+                                        <option value="en" data-i18n="lang_en">English (US)</option>
+                                    </select>
+                                    <i data-lucide="chevron-down"></i>
                                 </div>
-                                <div class="form-group">
-                                    <label data-i18n="label_timezone">Timezone</label>
-                                    <div class="select-wrapper has-icon-left">
-                                        <i data-lucide="clock" class="select-icon-left"></i>
-                                        <select id="pref-timezone">
-                                            <option value="Asia/Jakarta" data-i18n="tz_jakarta">WIB (UTC+7)</option>
-                                            <option value="Asia/Makassar" data-i18n="tz_makassar">WITA (UTC+8)</option>
-                                            <option value="Asia/Jayapura" data-i18n="tz_jayapura">WIT (UTC+9)</option>
-                                            <option value="UTC" data-i18n="tz_utc">UTC / GMT</option>
-                                        </select>
-                                        <i data-lucide="chevron-down"></i>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="label_timezone">Timezone</label>
+                                <div class="select-wrapper has-icon-left">
+                                    <i data-lucide="clock" class="select-icon-left"></i>
+                                    <select id="pref-timezone">
+                                        <option value="Asia/Jakarta" data-i18n="tz_jakarta">WIB (UTC+7)</option>
+                                        <option value="Asia/Makassar" data-i18n="tz_makassar">WITA (UTC+8)</option>
+                                        <option value="Asia/Jayapura" data-i18n="tz_jayapura">WIT (UTC+9)</option>
+                                        <option value="UTC" data-i18n="tz_utc">UTC / GMT</option>
+                                    </select>
+                                    <i data-lucide="chevron-down"></i>
                                 </div>
-                                <div class="form-group">
-                                    <label data-i18n="label_currency">Currency Format</label>
-                                    <div class="select-wrapper has-icon-left">
-                                        <i data-lucide="banknote" class="select-icon-left"></i>
-                                        <select id="pref-currency">
-                                            <option value="IDR" data-i18n="cur_idr">IDR (Rupiah)</option>
-                                            <option value="USD" data-i18n="cur_usd">USD (Dollar)</option>
-                                        </select>
-                                        <i data-lucide="chevron-down"></i>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="label_currency">Currency Format</label>
+                                <div class="select-wrapper has-icon-left">
+                                    <i data-lucide="banknote" class="select-icon-left"></i>
+                                    <select id="pref-currency">
+                                        <option value="IDR" data-i18n="cur_idr">IDR (Rupiah)</option>
+                                        <option value="USD" data-i18n="cur_usd">USD (Dollar)</option>
+                                    </select>
+                                    <i data-lucide="chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Alerts -->
+                        <div class="glass" style="padding: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="bell" style="color: var(--accent);"></i>
+                                <span data-i18n="sec_notif">Notification Alerts</span>
+                            </h3>
+                            <div class="form-group">
+                                <label data-i18n="label_threshold">Alert Threshold</label>
+                                <input type="number" id="pref-threshold" placeholder="100">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;"
+                                    data-i18n="hint_threshold">System will send alert when quota reaches this
+                                    number.</div>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="label_webhook_type">Notification Channel</label>
+                                <div class="select-wrapper">
+                                    <select id="pref-webhook-channel" onchange="toggleWebhookFields(this.value)">
+                                        <option value="none" data-i18n="notif_disabled">Disabled</option>
+                                        <option value="telegram" data-i18n="notif_telegram">Telegram Bot</option>
+                                        <option value="webhook" data-i18n="notif_webhook">Generic Webhook (POST)
+                                        </option>
+                                    </select>
+                                    <i data-lucide="chevron-down"></i>
                                 </div>
                             </div>
 
-                            <!-- Notification Alerts -->
-                            <div class="glass" style="padding: 2rem;">
-                                <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i data-lucide="bell" style="color: var(--accent);"></i>
-                                    <span data-i18n="sec_notif">Notification Alerts</span>
-                                </h3>
-                                <div class="form-group">
-                                    <label data-i18n="label_threshold">Alert Threshold</label>
-                                    <input type="number" id="pref-threshold" placeholder="100">
-                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;"
-                                        data-i18n="hint_threshold">System will send alert when quota reaches this
-                                        number.</div>
+                            <!-- Telegram Fields -->
+                            <div id="group-tg"
+                                style="display: none; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.75rem; margin-top: 1rem;">
+                                <div
+                                    style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem;">
+                                    <strong style="color: #60a5fa; display: block; margin-bottom: 0.25rem;"
+                                        data-i18n="setup_bot_title">Cara Setup Bot:</strong>
+                                    <div data-i18n="setup_bot_step1">1. Buat bot di @BotFather untuk dapat API
+                                        Token.</div>
+                                    <div data-i18n="setup_bot_step2">2. Cari ID angka Anda di @userinfobot untuk
+                                        Chat ID.</div>
+                                    <div data-i18n="setup_bot_step3">3. Klik Test Notification untuk mengaktifkan
+                                        fitur /cek_kuota.</div>
                                 </div>
-                                <div class="form-group">
-                                    <label data-i18n="label_webhook_type">Notification Channel</label>
-                                    <div class="select-wrapper">
-                                        <select id="pref-webhook-channel" onchange="toggleWebhookFields(this.value)">
-                                            <option value="none" data-i18n="notif_disabled">Disabled</option>
-                                            <option value="telegram" data-i18n="notif_telegram">Telegram Bot</option>
-                                            <option value="webhook" data-i18n="notif_webhook">Generic Webhook (POST)
-                                            </option>
-                                        </select>
-                                        <i data-lucide="chevron-down"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Telegram Fields -->
-                                <div id="group-tg"
-                                    style="display: none; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.75rem; margin-top: 1rem;">
-                                    <div
-                                        style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem;">
-                                        <strong style="color: #60a5fa; display: block; margin-bottom: 0.25rem;"
-                                            data-i18n="setup_bot_title">Cara Setup Bot:</strong>
-                                        <div data-i18n="setup_bot_step1">1. Buat bot di @BotFather untuk dapat API
-                                            Token.</div>
-                                        <div data-i18n="setup_bot_step2">2. Cari ID angka Anda di @userinfobot untuk
-                                            Chat ID.</div>
-                                        <div data-i18n="setup_bot_step3">3. Klik Test Notification untuk mengaktifkan
-                                            fitur /cek_kuota.</div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 1rem;">
-                                        <label data-i18n="label_telegram_token">Telegram Bot Token</label>
-                                        <div style="position: relative;">
-                                            <input type="password" id="pref-tg-token" placeholder="123456:ABC-DEF..."
-                                                style="width: 100%; padding-right: 3rem;">
-                                            <button type="button" onclick="toggleTokenVisibility()"
-                                                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.5rem;">
-                                                <i data-lucide="eye" id="tg-token-eye"
-                                                    style="width: 18px; height: 18px;"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 1rem;">
-                                        <label data-i18n="label_telegram_chat">Telegram Chat ID (Angka Saja)</label>
-                                        <input type="text" id="pref-tg-chat" placeholder="Contoh: 6758638566"
-                                            oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
-                                        <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.25rem;"
-                                            data-i18n="label_tg_chat_hint">Gunakan ID angka, bukan @username.</div>
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label data-i18n="label_telegram_token">Telegram Bot Token</label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="pref-tg-token" placeholder="123456:ABC-DEF..."
+                                            style="width: 100%; padding-right: 3rem;">
+                                        <button type="button" onclick="toggleTokenVisibility()"
+                                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.5rem;">
+                                            <i data-lucide="eye" id="tg-token-eye"
+                                                style="width: 18px; height: 18px;"></i>
+                                        </button>
                                     </div>
                                 </div>
-
-                                <!-- Webhook Fields -->
-                                <div id="group-webhook"
-                                    style="display: none; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.75rem; margin-top: 1rem;">
-                                    <div class="form-group">
-                                        <label data-i18n="label_webhook_url">Webhook URL</label>
-                                        <input type="text" id="pref-webhook-url"
-                                            placeholder="https://api.yourdomain.com/webhook" autocapitalize="none" autocorrect="off" spellcheck="false">
-                                    </div>
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label data-i18n="label_telegram_chat">Telegram Chat ID (Angka Saja)</label>
+                                    <input type="text" id="pref-tg-chat" placeholder="Contoh: 6758638566"
+                                        oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
+                                    <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.25rem;"
+                                        data-i18n="label_tg_chat_hint">Gunakan ID angka, bukan @username.</div>
                                 </div>
-
-                                <button type="button" class="btn btn-outline" style="width: 100%; margin-top: 1.5rem;"
-                                    onclick="testSettingsNotification()">
-                                    <i data-lucide="send"
-                                        style="width: 14px; height: 14px; margin-right: 0.5rem; vertical-align: middle;"></i>
-                                    <span data-i18n="btn_test">Test Notification</span>
-                                </button>
                             </div>
+
+                            <!-- Webhook Fields -->
+                            <div id="group-webhook"
+                                style="display: none; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.75rem; margin-top: 1rem;">
+                                <div class="form-group">
+                                    <label data-i18n="label_webhook_url">Webhook URL</label>
+                                    <input type="text" id="pref-webhook-url"
+                                        placeholder="https://api.yourdomain.com/webhook" autocapitalize="none"
+                                        autocorrect="off" spellcheck="false">
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-outline" style="width: 100%; margin-top: 1.5rem;"
+                                onclick="testSettingsNotification()">
+                                <i data-lucide="send"
+                                    style="width: 14px; height: 14px; margin-right: 0.5rem; vertical-align: middle;"></i>
+                                <span data-i18n="btn_test">Test Notification</span>
+                            </button>
+                        </div>
                         <!-- Security Health -->
                         <div class="glass" style="padding: 2rem; grid-column: 1 / -1;">
-                                <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i data-lucide="shield-check" style="color: var(--success);"></i>
-                                    <span data-i18n="sec_security">Security Health</span>
-                                </h3>
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="shield-check" style="color: var(--success);"></i>
+                                <span data-i18n="sec_security">Security Health</span>
+                            </h3>
 
-                                <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
                                 <div
                                     style="flex: 1; min-width: 0; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 0.75rem; border: 1px solid var(--border-color);">
                                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;"
                                         data-i18n="label_username">Username</div>
-                                    <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="setting-username">loading...</div>
+                                    <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                        id="setting-username">loading...</div>
                                 </div>
                                 <div
                                     style="flex: 1; min-width: 0; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 0.75rem; border: 1px solid var(--border-color);">
                                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;"
                                         data-i18n="label_email">Email</div>
-                                    <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="setting-email">loading...</div>
+                                    <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                        id="setting-email">loading...</div>
                                 </div>
                             </div>
 
@@ -736,57 +817,67 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                     style="padding: 0.85rem 2.5rem; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);"
                                     onclick="savePreferences()" data-i18n="btn_save">Save Changes</button>
                             </div>
-                            </div> <!-- Right Column Inner / Glass -->
-                        </div> <!-- responsive-grid (550) -->
-                    </div> <!-- tab-settings (547) -->
+                        </div> <!-- Right Column Inner / Glass -->
+                    </div> <!-- responsive-grid (550) -->
+                </div> <!-- tab-settings (547) -->
 
                 <!-- Billing Tab -->
                 <div id="tab-billing" style="display: none; padding-top: 2rem;">
-                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="nav_billing">Billing & Invoices
+                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="nav_billing">
+                        Billing & Invoices
                     </h2>
 
                     <div style="max-width: 1200px; margin: 0 auto;">
 
-                    <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 0.5rem;" data-i18n="billing_summary">Ringkasan Langganan</h3>
-                        <p style="color: var(--text-secondary);" data-i18n="billing_prepaid">Anda menggunakan paket
-                            <b>Prepaid (Top-up)</b>.</p>
-                    </div>
-
-                    <div class="glass" style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="history" style="color: var(--accent);"></i>
-                            <span data-i18n="billing_history">Riwayat Transaksi</span>
-                        </h3>
-                        <div id="billing-list">
-                            <!-- Transactions will appear here -->
+                        <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 0.5rem;" data-i18n="billing_summary">Ringkasan Langganan</h3>
+                            <p style="color: var(--text-secondary);" data-i18n="billing_prepaid">Anda menggunakan paket
+                                <b>Prepaid (Top-up)</b>.
+                            </p>
                         </div>
 
-                        <!-- Admin Contact Footer -->
-                        <div id="billing-contact-footer" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem; text-align: center;" data-i18n="billing_support_hint">Butuh bantuan dengan transaksi Anda? Hubungi admin:</p>
-                            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
-                                <a id="footer-wa-link" href="#" target="_blank"
-                                    style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;" 
-                                    onmouseover="this.style.color='#25d366'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateY(0)'">
-                                    <img src="/assets/img/whatsapp.jpg" style="width: 18px; height: 18px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                    <span id="footer-wa-text">WhatsApp Admin</span>
-                                </a>
-                                <a id="footer-email-link" href="#"
-                                    style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;"
-                                    onmouseover="this.style.color='#ea4335'; this.style.transform='translateY(-2px)'" onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateY(0)'">
-                                    <img src="/assets/img/gmail.png" style="width: 18px; height: 18px; object-fit: contain;">
-                                    <span id="footer-email-text">Email Admin</span>
-                                </a>
-                            </div> <!-- End flex wrapper (759) -->
-                        </div> <!-- End billing-contact-footer (757) -->
+                        <div class="glass" style="padding: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="history" style="color: var(--accent);"></i>
+                                <span data-i18n="billing_history">Riwayat Transaksi</span>
+                            </h3>
+                            <div id="billing-list">
+                                <!-- Transactions will appear here -->
+                            </div>
+
+                            <!-- Admin Contact Footer -->
+                            <div id="billing-contact-footer"
+                                style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem; text-align: center;"
+                                    data-i18n="billing_support_hint">Butuh bantuan dengan transaksi Anda? Hubungi admin:
+                                </p>
+                                <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                                    <a id="footer-wa-link" href="#" target="_blank"
+                                        style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;"
+                                        onmouseover="this.style.color='#25d366'; this.style.transform='translateY(-2px)'"
+                                        onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateY(0)'">
+                                        <img src="/assets/img/whatsapp.jpg"
+                                            style="width: 18px; height: 18px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                        <span id="footer-wa-text">WhatsApp Admin</span>
+                                    </a>
+                                    <a id="footer-email-link" href="#"
+                                        style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;"
+                                        onmouseover="this.style.color='#ea4335'; this.style.transform='translateY(-2px)'"
+                                        onmouseout="this.style.color='var(--text-secondary)'; this.style.transform='translateY(0)'">
+                                        <img src="/assets/img/gmail.png"
+                                            style="width: 18px; height: 18px; object-fit: contain;">
+                                        <span id="footer-email-text">Email Admin</span>
+                                    </a>
+                                </div> <!-- End flex wrapper (759) -->
+                            </div> <!-- End billing-contact-footer (757) -->
                         </div> <!-- Billing glass 2 (745) -->
-                        </div> <!-- Billing content wrapper (737) -->
-                    </div> <!-- tab-billing (733) -->
+                    </div> <!-- Billing content wrapper (737) -->
+                </div> <!-- tab-billing (733) -->
 
                 <!-- Profile Tab -->
                 <div id="tab-profile" style="display: none; padding-top: 2rem;">
-                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;" data-i18n="profile_title_full">Profil &
+                    <h2 style="font-size: 1.875rem; margin-bottom: 1.5rem; text-align: center;"
+                        data-i18n="profile_title_full">Profil &
                         Keamanan</h2>
 
                     <div class="responsive-grid">
@@ -803,37 +894,49 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                         data-i18n="label_username">Username</label>
                                     <div style="font-weight: 600;" id="prof-username">loading...</div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                     <div style="flex: 1; min-width: 200px;">
                                         <label
                                             style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;"
                                             data-i18n="label_email">Email Address</label>
-                                        <div style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem; width: 100%;">
-                                            <img src="/assets/img/gmail.png" style="width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;">
-                                            <span id="prof-email" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; flex: 1;">loading...</span>
+                                        <div
+                                            style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                                            <img src="/assets/img/gmail.png"
+                                                style="width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;">
+                                            <span id="prof-email"
+                                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; flex: 1;">loading...</span>
                                         </div>
                                     </div>
-                                    <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; align-self: flex-end;"
+                                    <button class="btn btn-outline"
+                                        style="padding: 0.4rem 0.8rem; font-size: 0.75rem; align-self: flex-end;"
                                         onclick="showSecurityForm('email')" data-i18n="btn_change">Ubah</button>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                     <div style="flex: 1; min-width: 200px;">
                                         <label
                                             style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;"
                                             data-i18n="profile_label_phone">Nomor HP</label>
-                                        <div style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem; width: 100%;">
-                                            <img src="/assets/img/whatsapp.jpg" style="width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;">
-                                            <span id="prof-phone" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; flex: 1;">loading...</span>
+                                        <div
+                                            style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                                            <img src="/assets/img/whatsapp.jpg"
+                                                style="width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;">
+                                            <span id="prof-phone"
+                                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; flex: 1;">loading...</span>
                                         </div>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 0.5rem; align-self: flex-end;">
-                                        <span style="font-size: 10px; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Soon</span>
-                                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; opacity: 0.5; cursor: not-allowed;" disabled data-i18n="btn_change">Ubah</button>
+                                        <span
+                                            style="font-size: 10px; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Soon</span>
+                                        <button class="btn btn-outline"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem; opacity: 0.5; cursor: not-allowed;"
+                                            disabled data-i18n="btn_change">Ubah</button>
                                     </div>
                                 </div>
                             </div>
                         </div> <!-- End Profile Card -->
-        
+
                         <!-- Security Hub -->
                         <div class="glass" style="padding: 2rem;">
                             <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -841,7 +944,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                     data-i18n="profile_security_hub">Proteksi Keamanan</span>
                             </h3>
                             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <div style="background: rgba(16, 185, 129, 0.05); padding: 1rem; border-radius: 0.5rem;">
+                                <div
+                                    style="background: rgba(16, 185, 129, 0.05); padding: 1rem; border-radius: 0.5rem;">
                                     <div style="font-size: 0.85rem; font-weight: 600; color: var(--success); margin-bottom: 0.25rem;"
                                         data-i18n="profile_2fa_status">2FA Aktif</div>
                                     <p style="font-size: 0.75rem; color: var(--text-secondary);"
@@ -869,7 +973,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 <input type="hidden" id="edit-key-id">
                 <div class="form-group">
                     <label data-i18n="label_username">Label</label>
-                    <input type="text" id="edit-label" required autocapitalize="none" autocorrect="off" spellcheck="false">
+                    <input type="text" id="edit-label" required autocapitalize="none" autocorrect="off"
+                        spellcheck="false">
                 </div>
                 <div class="form-group">
                     <label style="display: flex; justify-content: space-between; align-items: center;">
@@ -881,7 +986,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                         style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
                         <!-- IP rows will be added here -->
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;" data-i18n="hint_whitelist">Kosongkan jika IP
+                    <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;"
+                        data-i18n="hint_whitelist">Kosongkan jika IP
                         bebas (Any IP).</p>
                 </div>
                 <div class="form-group">
@@ -940,14 +1046,16 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                             style="padding: 1rem; cursor: pointer; border: 1px solid var(--border-color);"
                             id="pay-crypto" onclick="selectPayMethod('crypto')">
                             <div style="font-weight: 600; font-size: 0.9rem;">Crypto</div>
-                            <div style="font-size: 0.7rem; color: var(--text-secondary);" data-i18n="modal_topup_crypto_hint">Base / Plasma (EVM)</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);"
+                                data-i18n="modal_topup_crypto_hint">Base / Plasma (EVM)</div>
                         </div>
                     </div>
                 </div>
 
                 <div id="crypto-options"
                     style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
-                    <label style="font-size: 0.8rem; color: var(--text-secondary);" data-i18n="label_crypto_selection">Select Chain & Stablecoin</label>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);"
+                        data-i18n="label_crypto_selection">Select Chain & Stablecoin</label>
                     <div class="select-wrapper">
                         <select id="crypto-chain">
                             <option value="plasma:USDT" data-img="/assets/img/payments/plasma_usdt.png">USDT (Plasma)
@@ -992,8 +1100,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; display: none; align-items: center; justify-content: center; gap: 0.75rem;">
                 <i data-lucide="clock" style="width: 20px; height: 20px; color: #f59e0b;"></i>
                 <div style="text-align: left;">
-                    <div
-                        style="font-size: 0.7rem; color: #f59e0b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;" data-i18n="modal_crypto_countdown">
+                    <div style="font-size: 0.7rem; color: #f59e0b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+                        data-i18n="modal_crypto_countdown">
                         Selesaikan Pembayaran Dalam</div>
                     <div id="checkout-timer"
                         style="font-size: 1.25rem; font-weight: 800; color: #f59e0b; font-family: monospace;">00:00:00
@@ -1002,14 +1110,19 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             </div>
 
             <div class="glass" style="padding: 1.5rem; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2);">
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;" data-i18n="label_amount_to_send">Amount to Send</div>
-                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);" id="crypto-amount-display">0.00 USDT</div>
-                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;" data-i18n="label_market_rate">Live Market Rate</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;"
+                    data-i18n="label_amount_to_send">Amount to Send</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);" id="crypto-amount-display">0.00
+                    USDT</div>
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;"
+                    data-i18n="label_market_rate">Live Market Rate</div>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
                 <label
-                    style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><span data-i18n="label_wallet_address">Wallet Address</span> (<span id="crypto-chain-display">Base (USDC)</span>)</label>
+                    style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><span
+                        data-i18n="label_wallet_address">Wallet Address</span> (<span id="crypto-chain-display">Base
+                        (USDC)</span>)</label>
                 <div
                     style="display: flex; flex-direction: column; align-items: center; gap: 1rem; background: #0b0e14; padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-color);">
                     <img id="crypto-qr-display" src="" alt="QR Code"
@@ -1030,15 +1143,16 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                     style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-align: left;"
                     data-i18n="label_txid_hint">Sudah bayar? Masukkan Transaction Hash (TXID) untuk
                     verifikasi:</label>
-                <input type="text" id="crypto-tx-hash" data-i18n-placeholder="placeholder_txid" placeholder="Cukup beri TX ID saja dulu (0x...)"
-                    autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+                <input type="text" id="crypto-tx-hash" data-i18n-placeholder="placeholder_txid"
+                    placeholder="Cukup beri TX ID saja dulu (0x...)" autocomplete="off" autocapitalize="none"
+                    autocorrect="off" spellcheck="false"
                     style="width: 100%; padding: 0.75rem; background: #0b0e14; border: 1px solid var(--border-color); color: white; border-radius: 0.5rem; outline: none; font-family: monospace; font-size: 0.8rem;">
             </div>
 
             <div
                 style="background: rgba(245, 158, 11, 0.1); border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem; border: 1px solid rgba(245, 158, 11, 0.2);">
-                <p
-                    style="font-size: 0.75rem; color: #f59e0b; display: flex; align-items: start; gap: 0.5rem; text-align: left;" data-i18n="modal_crypto_hint_auto">
+                <p style="font-size: 0.75rem; color: #f59e0b; display: flex; align-items: start; gap: 0.5rem; text-align: left;"
+                    data-i18n="modal_crypto_hint_auto">
                     <i data-lucide="info" style="min-width: 16px;"></i>
                     Kuota API akan masuk <b>OTOMATIS</b> setelah hash transaksi Anda diverifikasi oleh sistem (biasanya
                     1-2 menit).
@@ -1051,7 +1165,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <button id="btn-submit-proof" class="btn btn-primary" onclick="submitCryptoProof()" data-i18n="btn_confirm_now">Confirm Payment Now</button>
+                <button id="btn-submit-proof" class="btn btn-primary" onclick="submitCryptoProof()"
+                    data-i18n="btn_confirm_now">Confirm Payment Now</button>
                 <button class="btn btn-outline" onclick="closeCryptoCheckout()" data-i18n="btn_close">Close</button>
             </div>
         </div>
@@ -1064,7 +1179,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             <button class="modal-close" onclick="closeVerifyCodeModal()"><i data-lucide="x"></i></button>
             <i data-lucide="mail" style="width: 48px; height: 48px; color: var(--accent); margin: 0 auto 1.5rem;"></i>
             <h2 style="margin-bottom: 1rem;" data-i18n="modal_verify_title">Verifikasi Akun</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;" data-i18n="modal_verify_desc">Masukkan kode OTP yang kami
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;"
+                data-i18n="modal_verify_desc">Masukkan kode OTP yang kami
                 kirimkan ke email Anda untuk mengaktifkan akun.</p>
 
             <form id="verify-form">
@@ -1119,13 +1235,18 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                     <div class="form-group" id="group-new-val">
                         <label id="label-new-val" data-i18n="label_new_val">New Value</label>
                         <div id="new-val-wrapper" style="display:flex;align-items:center;gap:0.75rem;">
-                            <div id="security-country-code-wrapper" style="display:none; align-items:center; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); border-radius:0.75rem; padding:0 0.75rem; height:44px; flex-shrink:0;">
-                                <span style="font-size:0.875rem; color:var(--text-secondary); margin-right:2px;">+</span>
-                                <input type="number" id="security-country-code" value="62" style="background:none; border:none; color:var(--text-primary); width:35px; padding:0; font-size:0.875rem; outline:none;" placeholder="62">
+                            <div id="security-country-code-wrapper"
+                                style="display:none; align-items:center; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); border-radius:0.75rem; padding:0 0.75rem; height:44px; flex-shrink:0;">
+                                <span
+                                    style="font-size:0.875rem; color:var(--text-secondary); margin-right:2px;">+</span>
+                                <input type="number" id="security-country-code" value="62"
+                                    style="background:none; border:none; color:var(--text-primary); width:35px; padding:0; font-size:0.875rem; outline:none;"
+                                    placeholder="62">
                             </div>
                             <div style="position:relative;flex:1;">
                                 <input type="text" id="security-new-val" style="width:100%;padding-right:2.8rem;"
-                                    autocomplete="off" data-i18n-placeholder="placeholder_new_val" required autocapitalize="none" autocorrect="off" spellcheck="false">
+                                    autocomplete="off" data-i18n-placeholder="placeholder_new_val" required
+                                    autocapitalize="none" autocorrect="off" spellcheck="false">
                                 <button type="button" id="toggle-security-new"
                                     onclick="toggleDashboardPassword('security-new-val')"
                                     style="display:none;position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:0;">
@@ -1151,7 +1272,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
                     <!-- OTP Channel Selector (Redesigned List) -->
                     <div class="form-group" id="group-security-channel" style="display: none;">
-                        <label data-i18n="label_otp_channel" style="margin-bottom: 0.75rem; display: block;">Verification Method</label>
+                        <label data-i18n="label_otp_channel"
+                            style="margin-bottom: 0.75rem; display: block;">Verification Method</label>
                         <div class="otp-channel-list">
                             <!-- Email Option -->
                             <div class="otp-channel-card active" onclick="selectOTPChannel('email', this)">
@@ -1160,7 +1282,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                 </div>
                                 <div class="channel-info">
                                     <span class="channel-title">Email Address</span>
-                                    <span class="channel-desc" id="otp-email-display">Send code to your registered email</span>
+                                    <span class="channel-desc" id="otp-email-display">Send code to your registered
+                                        email</span>
                                 </div>
                                 <input type="radio" name="otp-channel" value="email" checked style="display: none;">
                             </div>
@@ -1175,7 +1298,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                         <span class="channel-title">WhatsApp</span>
                                         <span class="status-badge-soon">Soon</span>
                                     </div>
-                                    <span class="channel-desc" id="otp-phone-display">Verification via instant message</span>
+                                    <span class="channel-desc" id="otp-phone-display">Verification via instant
+                                        message</span>
                                 </div>
                                 <input type="radio" name="otp-channel" value="phone" disabled style="display: none;">
                             </div>
@@ -1248,16 +1372,19 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             </div>
             <div class="form-group">
                 <label data-i18n="label_key_name">Label / Nama Kunci</label>
-                <input type="text" id="new-key-label" placeholder="Contoh: Production, Website, Mobile App" required autocapitalize="none" autocorrect="off" spellcheck="false">
+                <input type="text" id="new-key-label" placeholder="Contoh: Production, Website, Mobile App" required
+                    autocapitalize="none" autocorrect="off" spellcheck="false">
             </div>
             <div
                 style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
-                <i data-lucide="info" style="width: 12px; height: 12px;"></i> <span data-i18n="hint_key_auto_quota">Kunci baru otomatis mendapatkan kuota
+                <i data-lucide="info" style="width: 12px; height: 12px;"></i> <span
+                    data-i18n="hint_key_auto_quota">Kunci baru otomatis mendapatkan kuota
                     1.000 requests.</span>
             </div>
 
             <button type="button" id="btn-confirm-generate" class="btn btn-primary"
-                style="width: 100%; margin-top: 1.5rem;" onclick="confirmGenerateKey()" data-i18n="btn_confirm_create">Create API Key</button>
+                style="width: 100%; margin-top: 1.5rem;" onclick="confirmGenerateKey()"
+                data-i18n="btn_confirm_create">Create API Key</button>
             <button type="button" class="btn btn-outline" style="width: 100%; margin-top: 1rem;"
                 onclick="closeGenerateModal()" data-i18n="btn_cancel">Batal</button>
         </div>
@@ -1276,9 +1403,9 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         window._selectedPlaygroundKey = null;
 
         // Global fetch interceptor — handle session termination (FIX 4)
-        (function() {
+        (function () {
             const _originalFetch = window.fetch;
-            window.fetch = async function(...args) {
+            window.fetch = async function (...args) {
                 let res;
                 try {
                     res = await _originalFetch.apply(this, args);
@@ -1288,8 +1415,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 if (res.status === 401) {
                     const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || '';
                     const isAuthEndpoint = url.includes('/auth/login') ||
-                                           url.includes('/auth/register') ||
-                                           url.includes('/auth/verify');
+                        url.includes('/auth/register') ||
+                        url.includes('/auth/verify');
                     if (!isAuthEndpoint) {
                         localStorage.removeItem('shipstream_token');
                         localStorage.removeItem('shipstream_username');
@@ -1407,11 +1534,11 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 if (res.ok) {
                     currentUser = await res.json();
                     console.log(`[${stage}] Data received for user: ${currentUser.username}`);
-                    
+
                     document.getElementById('display-username').innerText = currentUser.username;
                     document.getElementById('prof-username').innerText = currentUser.username;
                     document.getElementById('prof-email').innerText = currentUser.email;
-                    
+
                     const phoneEl = document.getElementById('prof-phone');
                     if (phoneEl) {
                         if (!currentUser.phone_number) {
@@ -1427,19 +1554,19 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
                     document.getElementById('header-quota-stat').innerText = remaining.toLocaleString();
                     document.getElementById('global-usage-text').innerText = remaining.toLocaleString();
-                    
+
                     // Update Progress Bar & Detail Info
                     const usagePercent = limit > 0 ? (used / limit) * 100 : 0;
                     const barEl = document.getElementById('global-usage-bar');
                     if (barEl) {
                         barEl.style.width = Math.min(usagePercent, 100) + '%';
-                        
+
                         // Color coding based on pressure
-                        if (usagePercent > 90) barEl.style.background = 'var(--danger)'; 
+                        if (usagePercent > 90) barEl.style.background = 'var(--danger)';
                         else if (usagePercent > 70) barEl.style.background = '#fbbf24'; // Warning (Yellow)
                         else barEl.style.background = 'var(--accent)';
                     }
-                    
+
                     const percentText = document.getElementById('global-usage-percent-text');
                     const limitText = document.getElementById('global-usage-limit-text');
                     if (percentText) percentText.innerText = `Terpakai: ${usagePercent.toFixed(1)}%`;
@@ -2449,7 +2576,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             if (typeof syncCustomSelects === 'function') {
                 syncCustomSelects();
             }
-            
+
             isUpdatingUI = false;
         }
 
@@ -3065,7 +3192,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 lucide.createIcons();
 
                 const limit = currentUser ? currentUser.quota_limit : 1000;
-                
+
                 const res = await fetch(`${API_URL}/apikey/generate`, {
                     method: 'POST',
                     headers: {
@@ -3102,7 +3229,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             if (currentUser) {
                 const remaining = currentUser.quota_limit - currentUser.quota_used;
                 document.getElementById('settings-remaining-val').innerText = remaining.toLocaleString();
-                
+
                 // Set constraints on the input
                 const limitInput = document.getElementById('edit-limit');
                 limitInput.max = currentUser.quota_limit;
@@ -3233,14 +3360,14 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 document.body.appendChild(modal);
                 openModal('confirm-dialog-modal');
 
-                document.getElementById('confirm-ok-btn').onclick = () => { 
-                    closeModal('confirm-dialog-modal'); 
+                document.getElementById('confirm-ok-btn').onclick = () => {
+                    closeModal('confirm-dialog-modal');
                     if (callback) callback();
-                    resolve(true); 
+                    resolve(true);
                 };
-                document.getElementById('confirm-cancel-btn').onclick = () => { 
-                    closeModal('confirm-dialog-modal'); 
-                    resolve(false); 
+                document.getElementById('confirm-cancel-btn').onclick = () => {
+                    closeModal('confirm-dialog-modal');
+                    resolve(false);
                 };
             });
         }
@@ -3538,7 +3665,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             const waUrl = contact.whatsapp_url || '#';
             const emailAddr = contact.email || '';
             const txidShort = tx && tx.tx_hash ? tx.tx_hash.slice(0, 20) + '...' : '';
-            
+
             let statusText = "kendala teknis";
             if (tx) {
                 if (tx.status === 'failed') statusText = t('msg_contact_failed');
@@ -3558,10 +3685,10 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
             const waMsg = encodeURIComponent(msgText);
             const finalWaUrl = waUrl !== '#' ? `${waUrl}?text=${waMsg}` : waUrl;
-            
+
             const emailSubject = tx ? encodeURIComponent(`[ShipStream] Bantuan Transaksi - ${tx.order_id}`) : encodeURIComponent(`[ShipStream] Bantuan Transaksi`);
             const emailBody = encodeURIComponent(msgText);
-            
+
             return `
                 <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.08);">
                     <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:1rem;text-align:center;">${t('label_help_contact')}</p>
@@ -3752,15 +3879,15 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
         function selectOTPChannel(value, element) {
             if (element.classList.contains('disabled')) return;
-            
+
             // Remove active class from all cards
             document.querySelectorAll('.otp-channel-card').forEach(card => {
                 card.classList.remove('active');
             });
-            
+
             // Add active class to clicked card
             element.classList.add('active');
-            
+
             // Sync with hidden radio input
             const radio = element.querySelector('input[type="radio"]');
             if (radio) {
@@ -3777,17 +3904,17 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 const rateRes = await fetch(`${API_URL}/v1/billing/exchange-rate`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                    if (rateRes.ok) {
-                        const rateData = await rateRes.json();
-                        idrPerUsd = rateData.rate;
-                        document.getElementById('rate-value').innerText = `1 USD ≈ Rp ${idrPerUsd.toLocaleString()}`;
-                    } else {
-                        document.getElementById('rate-value').innerText = 'Backend Fallback (Static)';
-                    }
-                } catch (err) {
-                    console.error('Failed to fetch rate:', err);
-                    document.getElementById('rate-value').innerText = 'Internal Fallback (Static)';
+                if (rateRes.ok) {
+                    const rateData = await rateRes.json();
+                    idrPerUsd = rateData.rate;
+                    document.getElementById('rate-value').innerText = `1 USD ≈ Rp ${idrPerUsd.toLocaleString()}`;
+                } else {
+                    document.getElementById('rate-value').innerText = 'Backend Fallback (Static)';
                 }
+            } catch (err) {
+                console.error('Failed to fetch rate:', err);
+                document.getElementById('rate-value').innerText = 'Internal Fallback (Static)';
+            }
 
             // Use frozen USD amount from metadata if available, otherwise calculate on the fly
             let amountUsd;
@@ -4339,7 +4466,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             const select = document.getElementById('playground-key-select');
             const container = document.getElementById('playground-key-select-container');
             const noKeyMsg = document.getElementById('playground-no-key-msg');
-            
+
             if (!select || !window._apiKeysCache) return;
 
             const activeKeys = window._apiKeysCache.filter(k => k.is_active && k.status === 'active');
@@ -4355,7 +4482,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
             const _prevKey = window._selectedPlaygroundKey || select.value;
 
-            select.innerHTML = activeKeys.map((k, idx) => 
+            select.innerHTML = activeKeys.map((k, idx) =>
                 `<option value="${k.key}">${k.label}</option>`
             ).join('');
 
@@ -4364,7 +4491,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 select.value = _prevKey;
             }
             window._selectedPlaygroundKey = select.value;
-            
+
             lucide.createIcons();
         }
 
@@ -4373,7 +4500,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             const inputContainer = document.getElementById('play-inputs-container');
             const trackGroup = document.getElementById('play-group-track');
             const costGroup = document.getElementById('play-group-cost');
-            
+
             // Auto execute for simple lists
             if (type === 'cities' || type === 'couriers') {
                 inputContainer.style.display = 'none';
@@ -4385,7 +4512,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             inputContainer.style.display = 'block';
             trackGroup.style.display = (type === 'track') ? 'block' : 'none';
             costGroup.style.display = (type === 'cost') ? 'block' : 'none';
-            
+
             lucide.createIcons();
         }
 
@@ -4411,14 +4538,24 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 container.style.display = 'block';
                 resultBox.innerText = 'Loading...';
 
-                let path = '';
+                let fetchOptions = {
+                    headers: { 
+                        'X-API-Key': activeKey,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
                 if (type === 'cities') path = '/v1/cities';
                 else if (type === 'couriers') path = '/v1/couriers';
                 else if (type === 'cost') {
-                    const origin = document.getElementById('play-origin').value;
-                    const dest = document.getElementById('play-dest').value;
-                    const weight = document.getElementById('play-weight').value;
-                    path = `/v1/cost?origin_id=${origin}&destination_id=${dest}&courier_code=jne&weight_gram=${weight}`;
+                    path = '/v1/cost';
+                    fetchOptions.method = 'POST';
+                    fetchOptions.body = JSON.stringify({
+                        origin: parseInt(document.getElementById('play-origin').value),
+                        destination: parseInt(document.getElementById('play-dest').value),
+                        weight: parseInt(document.getElementById('play-weight').value),
+                        courier: 'jne'
+                    });
                 }
                 else if (type === 'track') {
                     const awb = document.getElementById('play-awb').value.trim();
@@ -4427,12 +4564,10 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
                 endpointBox.innerText = path;
 
-                const res = await fetch(`${API_URL}${path}`, {
-                    headers: { 'X-API-Key': activeKey }
-                });
+                const res = await fetch(`${API_URL}${path}`, fetchOptions);
 
                 const data = await res.json();
-                
+
                 if (!res.ok) {
                     // Beautiful Error Display
                     resultBox.style.color = 'var(--text-primary)';
@@ -4554,7 +4689,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 await fetchAdminContact();
                 // Session terminated handling already implemented in index.html
                 // untuk menampilkan alert "Sesi Anda telah diakhiri" (implementasi di PROMPT D)
-                
+
                 updateUILanguage();
                 if (typeof lucide !== 'undefined') lucide.createIcons();
                 if (typeof initCustomSelects === 'function') initCustomSelects();
@@ -4566,7 +4701,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                         window._selectedPlaygroundKey = e.target.value;
                     });
                 }
-                
+
                 console.log('--- Dashboard Initialization success ---');
             } catch (err) {
                 console.error('--- Dashboard Initialization ERROR ---', err);
@@ -4726,6 +4861,16 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             </div>
         </div>
     </div>
+    <script>
+        // Splash Screen Logic
+        const splash = document.getElementById('splash');
+        if (splash) {
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 600);
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>

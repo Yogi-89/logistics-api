@@ -8,14 +8,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <link rel="icon" type="image/png" href="assets/logo_icon_dark_modern_blue-removebg-preview.png">
+    <style>
+        @keyframes splashAnim {
+            0%   { opacity: 0; filter: drop-shadow(0 0 0px #00d2ff); transform: scale(0.9); }
+            40%  { opacity: 1; filter: drop-shadow(0 0 20px #00d2ff); transform: scale(1); }
+            80%  { opacity: 1; filter: drop-shadow(0 0 10px #00d2ff); transform: scale(1); }
+            100% { opacity: 0; filter: drop-shadow(0 0 0px #00d2ff); transform: scale(1.1); }
+        }
+    </style>
 </head>
-<body>
+<body style="overflow-x: hidden;">
+    <!-- Splash Screen -->
+    <div id="splash" style="position:fixed;inset:0;background:#0b0d11;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.6s ease">
+        <img src="assets/logo_icon_white_modern_blue-removebg-preview.png" style="width:280px;height:280px;object-fit:contain;animation:splashAnim 3s ease forwards;">
+    </div>
     <div id="toast-container"></div>
 
     <!-- Navigation -->
     <nav class="landing-nav">
         <div class="nav-container">
-            <div class="logo">SHIPSTREAM</div>
+            <div class="logo">
+                <img src="assets/navbar_footer_dark_modern_blue-removebg-preview.png" alt="ShipStream" style="height: 36px; width: auto; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));">
+            </div>
             <div class="nav-links">
                 <a href="#features" data-i18n="nav_features">Features</a>
                 <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
@@ -773,6 +788,15 @@
                 }, 300);
             }
         })();
+
+        // Splash Screen Logic
+        const splash = document.getElementById('splash');
+        if (splash) {
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 600);
+            }, 3000);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             updateUI();

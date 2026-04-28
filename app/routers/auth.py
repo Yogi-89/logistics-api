@@ -39,9 +39,13 @@ async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         hashed_password=hashed_password,
         is_verified=False
     )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Gagal menyimpan user: {str(e)}")
 
     # 3. Create & 'Send' Verification Code
     create_verification_code(db, new_user.id, "email", "registration")
@@ -66,8 +70,12 @@ def verify_code(req: schemas.VerificationCode, db: Session = Depends(get_db)):
     if user:
         user.is_verified = True
     
-    db_code.is_used = True
-    db.commit()
+    try:
+        db_code.is_used = True
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui status verifikasi")
     
     return {"message": "Akun berhasil diverifikasi!", "status": "verified"}
 
@@ -111,8 +119,13 @@ async def login(request: Request, login_data: LoginJSON, db: Session = Depends(g
         device_info=user_agent,
         ip_address=client_ip
     )
-    db.add(new_session)
-    db.commit()
+    try:
+        db.add(new_session)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        # Non-critical: Login tetap berhasil meskipun session tracking gagal
+        pass
 
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -152,9 +165,13 @@ async def resend_registration_code(req: schemas.ResendCodeRequest, db: Session =
     create_verification_code(db, user.id, "email", "registration")
     
     # Update Tracking
-    user.resend_count += 1
-    user.last_resend_at = now
-    db.commit()
+    try:
+        user.resend_count += 1
+        user.last_resend_at = now
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal memperbarui data resend")
     
     return {
         "message": "Kode baru telah dikirim!",

@@ -31,7 +31,10 @@ def _auto_expire_pending(db: Session, user_id: int):
         tx.status = "expired"
         tx.status_reason = "Kadaluarsa"
     if expired_txs:
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
 
 
 def _auto_expire_awaiting(db: Session, user_id: int):
@@ -47,7 +50,10 @@ def _auto_expire_awaiting(db: Session, user_id: int):
         txid_display = tx.tx_hash[:20] + "..." if tx.tx_hash else "tidak diketahui"
         tx.status_reason = f"Tidak terkonfirmasi dalam {AWAITING_WINDOW_HOURS} jam. TXID: {txid_display}"
     if stale_txs:
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
 
 
 
@@ -120,9 +126,13 @@ async def create_topup(request: schemas.TopupRequest, db: Session = Depends(get_
         status="pending",
         expires_at=expires_at
     )
-    db.add(db_transaction)
-    db.commit()
-    db.refresh(db_transaction)
+    try:
+        db.add(db_transaction)
+        db.commit()
+        db.refresh(db_transaction)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal membuat pesanan topup")
     return db_transaction
 
 @router.get("/history", response_model=List[schemas.Transaction])
@@ -151,9 +161,13 @@ def cancel_pending_order(order_id: str, db: Session = Depends(get_db), current_u
             status_code=400,
             detail=f"Order dengan status '{tx.status}' tidak dapat dibatalkan."
         )
-    tx.status = "cancelled"
-    tx.status_reason = "Cancel by user"
-    db.commit()
+    try:
+        tx.status = "cancelled"
+        tx.status_reason = "Cancel by user"
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal membatalkan pesanan")
     return {"message": f"Order {order_id} telah dibatalkan.", "order_id": order_id, "status": "cancelled", "status_reason": "Cancel by user"}
 
 @router.post("/submit-proof/{order_id}")
@@ -195,38 +209,22 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
                 detail="Transaction Hash (TXID) ini sudah pernah digunakan untuk pesanan lain!"
             )
 
-    tx.tx_hash = tx_hash
-    db.commit()
-
-    # AUTOMATION: Try to verify with blockchain immediately
-    chain = tx.tx_metadata.get("chain", "base") if tx.tx_metadata else "base"
-    symbol = tx.tx_metadata.get("symbol", "USDC") if tx.tx_metadata else "USDC"
-    expected_usd = tx.tx_metadata.get("expected_usd") if tx.tx_metadata else None
-    verification = await validator.verify_crypto_payment(tx_hash, tx.amount, chain, symbol, expected_usd)
-    
-    if verification["status"] == "success":
-        # Automatically confirm payment
-        tx.status = "success"
-        tx.actual_crypto_amount = verification["amount_received"]
-        
-        # Update metadata with actual received values for auditing
-        current_metadata = tx.tx_metadata.copy() if tx.tx_metadata else {}
-        current_metadata["amount_received"] = verification["amount_received"]
-        current_metadata["verified_chain"] = verification["chain"]
-        current_metadata["verified_symbol"] = verification["symbol"]
-        tx.tx_metadata = current_metadata
-        
         # Global Quota Credit
         user = db.query(models.User).filter(models.User.id == tx.user_id).first()
         if user:
-            user.quota_limit = models.User.quota_limit + tx.quota_added
+            user.quota_limit += tx.quota_added
         
         # Optional: Legacy/Compatibility check
         api_key = db.query(models.APIKey).filter(models.APIKey.id == tx.api_key_id).first()
         if api_key and api_key.status == "limited":
             api_key.status = "active"
         
-        db.commit()
+        try:
+            tx.tx_hash = tx_hash
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise HTTPException(status_code=500, detail="Gagal memverifikasi pembayaran")
         return {
             "message": "Pembayaran BERHASIL diverifikasi secara otomatis! Kuota telah ditambahkan.",
             "status": "success",
@@ -234,17 +232,19 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
         }
     
     elif verification["status"] == "pending":
-        tx.status = "awaiting_verification"
-        db.commit()
-        return {
-            "message": f"TXID diterima, namun: {verification['message']}. Kami akan memverifikasi secara berkala atau Anda bisa menghubungi admin.",
-            "status": "awaiting_verification"
-        }
+        try:
+            tx.status = "awaiting_verification"
+            db.commit()
+        except Exception:
+            db.rollback()
     
     else:
         # Decisive Rejection: If amount is wrong/insufficient outside tolerance
-        tx.status = "failed"
-        db.commit()
+        try:
+            tx.status = "failed"
+            db.commit()
+        except Exception:
+            db.rollback()
         return {
             "message": f"Verifikasi otomatis GAGAL: {verification['message']}. Pastikan Anda mengirim jumlah yang benar.",
             "status": "failed",
@@ -265,20 +265,24 @@ def confirm_payment(order_id: str, db: Session = Depends(get_db)):
     if tx.status == "success":
         return {"message": "Transaction already processed"}
 
-    # Update status to success
-    tx.status = "success"
-    
-    # Global Quota Credit
-    user = db.query(models.User).filter(models.User.id == tx.user_id).first()
-    if user:
-        user.quota_limit += tx.quota_added
+    try:
+        # Update status to success
+        tx.status = "success"
         
-    # Optional: Legacy/Compatibility check (reset limited status if any)
-    api_key = db.query(models.APIKey).filter(models.APIKey.id == tx.api_key_id).first()
-    if api_key and api_key.status == "limited":
-        api_key.status = "active"
-    
-    db.commit()
+        # Global Quota Credit
+        user = db.query(models.User).filter(models.User.id == tx.user_id).first()
+        if user:
+            user.quota_limit += tx.quota_added
+            
+        # Optional: Legacy/Compatibility check (reset limited status if any)
+        api_key = db.query(models.APIKey).filter(models.APIKey.id == tx.api_key_id).first()
+        if api_key and api_key.status == "limited":
+            api_key.status = "active"
+        
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal mengonfirmasi pembayaran")
     return {
         "message": "Pembayaran berhasil dikonfirmasi. Kuota telah ditambahkan.", 
         "order_id": order_id,
