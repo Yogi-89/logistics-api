@@ -4,10 +4,12 @@ import sys
 
 import uvicorn
 
+from app.utils.env import get_database_url
+
 
 def prepare_database() -> None:
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
+    database_url = get_database_url()
+    if not database_url.startswith("sqlite"):
         subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], check=True)
         return
 

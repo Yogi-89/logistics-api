@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 import os
 import uuid
 from dotenv import load_dotenv
+from app.utils.env import get_int_env
 
 load_dotenv()
 
@@ -16,7 +17,7 @@ if not SECRET_KEY:
     SECRET_KEY = "yogi_prasetyo_uts_insecure_fallback"
 
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1440))
+ACCESS_TOKEN_EXPIRE_MINUTES = get_int_env("ACCESS_TOKEN_EXPIRE_MINUTES", 1440)
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
