@@ -20,12 +20,25 @@ os.environ.setdefault("RAJA_ONGKIR_API_KEY", "your_raja_ongkir_key_here")
 def patch_limiter_storage():
     """
     Patch storage limiter SlowAPI ke in-memory agar tidak butuh Redis.
-    autouse=True → diterapkan ke semua test tanpa perlu declare di setiap test.
     """
     from limits.storage import MemoryStorage
     from app.utils.limiter import limiter
 
-    # Ganti storage ke in-memory
     limiter._storage = MemoryStorage()
+    limiter.enabled = False
     yield
-    # Teardown (opsional — MemoryStorage tidak butuh cleanup)
+    limiter.enabled = True
+
+
+@pytest.fixture(autouse=True)
+def reset_limiter_storage():
+    """
+    Reset the in-memory storage before each test to avoid rate-limit
+    state leaking between tests.
+    """
+    from limits.storage import MemoryStorage
+    from app.utils.limiter import limiter
+
+    limiter._storage = MemoryStorage()
+    limiter.reset()
+    yield

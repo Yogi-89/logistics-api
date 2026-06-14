@@ -208,7 +208,17 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
                 status_code=status.HTTP_400_BAD_REQUEST, 
                 detail="Transaction Hash (TXID) ini sudah pernah digunakan untuk pesanan lain!"
             )
-
+    
+    # === AUTO-VERIFY via blockchain ===
+    verification = await validator.verify_crypto_payment(
+        tx_hash=tx_hash,
+        expected_idr_amount=tx.amount,
+        chain=tx.tx_metadata.get("chain", "base") if tx.tx_metadata else "base",
+        symbol=tx.tx_metadata.get("symbol", "USDC") if tx.tx_metadata else "USDC",
+        expected_usd=tx.tx_metadata.get("expected_usd") if tx.tx_metadata else None
+    )
+    
+    if verification["status"] == "success":
         # Global Quota Credit
         user = db.query(models.User).filter(models.User.id == tx.user_id).first()
         if user:
@@ -221,6 +231,7 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
         
         try:
             tx.tx_hash = tx_hash
+            tx.status = "success"
             db.commit()
         except Exception:
             db.rollback()

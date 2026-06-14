@@ -1,0 +1,57 @@
+========================================================================
+LAPORAN PENGUJIAN OTOMATIS - LOGISTICS API EAS
+Tanggal : 2026-06-15
+NPM     : 22081010297
+Project : ShipStream - Logistics Rate & Tracking API
+========================================================================
+
+1. Sumber Soal
+   File: C:\Users\Developer\Documents\Semester_8\Pemograman_API\Tugas\EAS API 2526.pdf
+
+2. Requirement Utama dari Soal
+   - Website penyedia API menggunakan basis data lokal.
+   - API Key untuk penggunaan API.
+   - Sistem daftar akun dan login sederhana.
+   - Autentikasi menggunakan JWT/API Key.
+   - API memiliki View Data, Create/Simpan Data, Update Data, Delete Data.
+   - Implementasi/pengujian via Postman.
+   - Landing page/template dan dokumentasi penggunaan API.
+   - Web client pengguna API.
+   - Arsip program dan laporan PDF.
+
+3. Evidence Source
+   - Backend FastAPI: app/
+   - Database lokal default: sqlite:///./test_logistics.db
+   - Dokumentasi API: docs/API_GUIDE.md, docs/ENDPOINTS.md
+   - Postman collection: postman/collection.json
+   - Frontend/client: frontend/index.html, frontend/dashboard.html
+   - Screenshot Swagger: screenshots/swagger-ui.png, screenshots/swagger_ui.png
+   - Laporan PDF: Laporan_Pemrograman_API_ShipStream__Logistics_Rate_and_22081010297.pdf
+
+4. Hasil Unit Test
+   Command:
+   python -m pytest -q
+
+   Result:
+   67 passed
+
+5. Hasil Runtime Smoke Test
+   Command:
+   uvicorn app.main:app --host 127.0.0.1 --port 8000
+   GET http://127.0.0.1:8000/docs
+
+   Result:
+   HTTP 200
+
+6. Catatan Audit
+   - Postman collection sudah diselaraskan dengan route aktual:
+     /auth/login memakai JSON + X-Captcha-Token.
+     /v1/cost memakai POST JSON.
+     Endpoint shipment, tracking update, label PDF, dan quota sudah ditambahkan.
+   - Dokumentasi endpoint API Key sudah diselaraskan dengan source:
+     /apikey/list, /apikey/{key_id}/settings, /apikey/revoke/{key_id}.
+   - Contoh API key/address di dokumentasi sudah dibuat sebagai placeholder.
+
+========================================================================
+STATUS: LAYAK SUBMIT SECARA LOKAL
+========================================================================

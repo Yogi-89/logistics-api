@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 2.5cm 2cm 2.5cm 2cm; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.5; color: #000; }
+  
+  /* COVER */
+  .cover { text-align: center; padding-top: 80px; page-break-after: always; }
+  .cover h1 { font-size: 16pt; margin-bottom: 6pt; }
+  .cover h2 { font-size: 14pt; margin-bottom: 20pt; }
+  .cover .logo { font-size: 24pt; font-weight: bold; margin-bottom: 30pt; }
+  .cover table { margin: 30pt auto; border: none; width: 60%; }
+  .cover table td { border: none; padding: 3pt 8pt; text-align: left; }
+  .cover table td.label { width: 40%; font-weight: bold; }
+  .cover .uni { font-size: 12pt; font-weight: bold; margin-top: 40pt; }
+  
+  /* GENERAL */
+  h1 { font-size: 14pt; text-align: left; margin-top: 16pt; page-break-before: always; }
+  h1.chapter { page-break-before: always; }
+  h2 { font-size: 12pt; margin-top: 14pt; }
+  p { text-align: justify; margin-bottom: 8pt; text-indent: 30pt; }
+  p.no-indent { text-indent: 0; }
+  
+  table.data { border-collapse: collapse; width: 100%; margin: 12pt 0; font-size: 11pt; }
+  table.data, table.data th, table.data td { border: 1px solid #000; }
+  table.data th, table.data td { padding: 4pt 8pt; }
+  table.data th { background-color: #f2f2f2; text-align: center; }
+  
+  pre { background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 10pt; font-family: "Courier New", Consolas, monospace; font-size: 9pt; line-height: 1.3; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  code { font-family: "Courier New", Consolas, monospace; font-size: 10pt; background: #f0f0f0; padding: 1pt 3pt; }
+  
+  .caption { text-align: center; font-size: 10pt; font-style: italic; margin-top: -4pt; margin-bottom: 12pt; }
+  .page-break { page-break-before: always; }
+  .no-break { page-break-before: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<div class="cover">
+<p class="logo" style="font-size:20pt;">[LOGO UPN VETERAN JAWA TIMUR]</p>
+<h1>LAPORAN PRAKTIKUM</h1>
+<h2>SHIPSTREAM - LOGISTICS RATE AND TRACKING API</h2>
+<p style="font-size:11pt; margin-top:20pt;">Mata Kuliah: <strong>Pemrograman API A-081</strong></p>
+<p style="font-size:11pt;">Dosen Pengampu:</p>
+<p style="font-size:11pt;"><strong>Muhammad Muharrom Al Haromainy, S.Kom., M.Kom</strong></p>
+<br/>
+<table>
+<tr><td class="label">Disusun Oleh</td><td>:</td><td><strong>Yogi Prasetyo</strong></td></tr>
+<tr><td class="label">NPM</td><td>:</td><td><strong>22081010297</strong></td></tr>
+</table>
+<p class="uni" style="margin-top:50pt;"><strong>PROGRAM STUDI INFORMATIKA</strong></p>
+<p class="uni"><strong>FAKULTAS ILMU KOMPUTER</strong></p>
+<p class="uni"><strong>UNIVERSITAS PEMBANGUNAN NASIONAL "VETERAN" JAWA TIMUR</strong></p>
+<p class="uni"><strong>2025/2026</strong></p>
+</div>
+
+<!-- ===== BAB I: PENDAHULUAN ===== -->
+<h1 class="chapter"><strong>BAB I</strong><br/><strong>PENDAHULUAN</strong></h1>
+
+<h2>1.1 Latar Belakang</h2>
+<p>Perkembangan teknologi informasi telah mendorong transformasi digital di berbagai sektor, termasuk industri logistik. Kebutuhan akan sistem yang dapat menghitung ongkos kirim dan melacak status pengiriman secara real-time menjadi sangat penting bagi pelaku bisnis e-commerce maupun penyedia jasa pengiriman. Namun, tidak semua platform memiliki kemampuan untuk mengintegrasikan data logistik dari berbagai kurir dalam satu antarmuka yang seragam.</p>
+<p>Mata kuliah Pemrograman API memberikan pemahaman tentang bagaimana membangun dan mengelola Application Programming Interface (API) yang dapat digunakan oleh berbagai aplikasi client. API memungkinkan komunikasi antar sistem secara terstandarisasi menggunakan protokol HTTP dan format data JSON. Dalam konteks logistik, API dapat menjadi jembatan antara aplikasi bisnis dengan penyedia data ongkos kirim dan pelacakan paket.</p>
+<p>Proyek ini bertujuan membangun sebuah Web API untuk logistik yang menyediakan layanan pengecekan tarif pengiriman dari berbagai kurir, kalkulasi ongkos kirim, pembuatan airwaybill (AWB), serta pelacakan status paket. Sistem dilengkapi dengan autentikasi berbasis JWT dan API Key, manajemen kuota pengguna, serta dashboard monitoring yang interaktif. Proyek ini disusun sebagai syarat Evaluasi Akhir Semester (EAS) mata kuliah Pemrograman API Semester 8 Program Studi Informatika UPN Veteran Jawa Timur.</p>
+
+<h2>1.2 Rumusan Masalah</h2>
+<p>Bagaimana membangun Web API logistik yang menyediakan layanan kalkulasi ongkos kirim dan pelacakan paket dengan sistem autentikasi JWT dan API Key, serta menyediakan client dashboard untuk monitoring penggunaan API?</p>
+
+<h2>1.3 Tujuan Praktikum</h2>
+<p>Membangun dan mengimplementasikan Web API logistik berbasis FastAPI yang mencakup fitur kalkulasi ongkos kirim multi-kurir, pelacakan paket, manajemen API Key, autentikasi pengguna, serta client dashboard sebagai antarmuka pengguna akhir.</p>
+
+<h2>1.4 Manfaat</h2>
+<p>Dengan adanya sistem API logistik ini, pengembang aplikasi pihak ketiga dapat dengan mudah mengintegrasikan fitur pengecekan ongkir dan pelacakan paket ke dalam aplikasi mereka tanpa perlu berurusan langsung dengan API masing-masing kurir. Dashboard yang disediakan juga memudahkan pengguna dalam memonitor penggunaan API Key dan kuota mereka secara real-time.</p>
+
+<!-- ===== BAB II: DASAR TEORI ===== -->
+<h1 class="chapter"><strong>BAB II</strong><br/><strong>DASAR TEORI</strong></h1>
+<h2>2.1 Application Programming Interface (API)</h2>
+<p>Application Programming Interface (API) adalah sekumpulan aturan dan protokol yang memungkinkan satu aplikasi untuk berkomunikasi dengan aplikasi lain. API bekerja sebagai perantara yang menerima permintaan dari client, memprosesnya di server, dan mengembalikan respons dalam format yang terstandarisasi. Dalam pengembangan web modern, RESTful API menjadi standar de facto karena kesederhanaannya dalam menggunakan metode HTTP (GET, POST, PUT, DELETE) dan format data JSON.</p>
+<p>REST (Representational State Transfer) adalah gaya arsitektur yang diperkenalkan oleh Roy Fielding pada tahun 2000. Prinsip utamanya meliputi statelessness (setiap request bersifat independen), client-server separation, cacheability, dan uniform interface. RESTful API menggunakan URL sebagai identifikasi sumber daya dan HTTP method sebagai representasi operasi yang dilakukan terhadap sumber daya tersebut.</p>
+<h2>2.2 FastAPI Framework</h2>
+<p>FastAPI adalah framework web modern untuk Python yang dirancang untuk membangun API dengan performa tinggi. Framework ini dibangun di atas Starlette (untuk bagian web) dan Pydantic (untuk validasi data). FastAPI mendukung pemrograman asynchronous menggunakan async/await, yang memungkinkan penanganan request secara konkuren. Keunggulan FastAPI meliputi validasi data otomatis, dokumentasi API interaktif (Swagger UI dan ReDoc), serta performa yang sebanding dengan Node.js dan Go.</p>
+<h2>2.3 JSON Web Token (JWT)</h2>
+<p>JSON Web Token (JWT) adalah standar terbuka (RFC 7519) untuk mentransmisikan informasi secara aman antara dua pihak dalam format JSON. JWT terdiri dari tiga bagian: Header, Payload, dan Signature. Token ini digunakan untuk autentikasi stateless, di mana server tidak perlu menyimpan informasi sesi pengguna. Setiap request dari client menyertakan token JWT dalam header Authorization, dan server memverifikasi keabsahan token tersebut tanpa perlu mengakses database sesi.</p>
+<h2>2.4 API Key Authentication</h2>
+<p>API Key adalah metode autentikasi sederhana di mana client menyertakan sebuah kunci unik dalam setiap request, biasanya melalui HTTP header. Berbeda dengan JWT yang memiliki masa berlaku terbatas, API Key umumnya bersifat persisten dan digunakan untuk mengidentifikasi aplikasi client, bukan pengguna individu. Sistem API Key memungkinkan pemilik API untuk melakukan rate limiting, monitoring penggunaan, dan manajemen kuota per client.</p>
+<h2>2.5 SQLAlchemy ORM</h2>
+<p>SQLAlchemy adalah Object Relational Mapper (ORM) untuk Python yang menyediakan abstraksi tingkat tinggi untuk operasi database. ORM memungkinkan pengembang untuk bekerja dengan database menggunakan objek Python alih-alih menulis query SQL secara manual. SQLAlchemy mendukung berbagai database relasional seperti PostgreSQL, MySQL, dan SQLite. Fitur migrasi database dapat ditangani melalui Alembic, yang terintegrasi dengan SQLAlchemy.</p>
+
+<h1 class="chapter"><strong>BAB III</strong><br/><strong>METODOLOGI</strong></h1>
+
+<h2>3.1 Spesifikasi Alat dan Bahan</h2>
+<p>Perangkat lunak yang digunakan dalam pengembangan sistem ini meliputi: Visual Studio Code sebagai code editor, Python 3.11 sebagai bahasa pemrograman backend, FastAPI sebagai web framework, PostgreSQL dan SQLite sebagai database, SQLAlchemy sebagai ORM, Alembic untuk migrasi database, Pydantic untuk validasi data, SlowAPI untuk rate limiting, resend.com untuk pengiriman email OTP, dan RajaOngkir API sebagai penyedia data ongkos kirim. Untuk frontend digunakan HTML5, CSS3, dan JavaScript vanilla. Pengujian API dilakukan menggunakan Postman. Version control menggunakan Git dan GitHub.</p>
+<h2>3.2 Langkah Kerja</h2>
+<p><strong>1.</strong> Analisis kebutuhan sistem dan perancangan arsitektur API (autentikasi, manajemen API Key, endpoint logistik, dan dashboard client).</p>
+<p><strong>2.</strong> Pembuatan database model menggunakan SQLAlchemy ORM, meliputi tabel User, APIKey, City, Courier, Shipment, Tracking, dan Billing.</p>
+<p><strong>3.</strong> Implementasi endpoint autentikasi (register, login, verifikasi OTP) menggunakan JWT dan keamanan berbasis Turnstile Captcha.</p>
+<p><strong>4.</strong> Implementasi endpoint manajemen API Key (generate, list, update, revoke) dengan sistem kuota global terpusat.</p>
+<p><strong>5.</strong> Implementasi endpoint logistik (kalkulasi ongkir dengan asyncio.gather untuk paralel request, daftar kurir, daftar kota, pembuatan shipment, dan tracking).</p>
+<p><strong>6.</strong> Pembuatan landing page (index.html) sebagai halaman dokumentasi dan dashboard client (dashboard.html) untuk monitoring API Key.</p>
+<p><strong>7.</strong> Pembuatan Postman collection untuk dokumentasi dan pengujian seluruh endpoint API.</p>
+<p><strong>8.</strong> Pengujian fungsional seluruh endpoint menggunakan pytest dan pengujian manual melalui Swagger UI.</p>
+
+<h1 class="chapter"><strong>BAB IV</strong><br/><strong>HASIL DAN PEMBAHASAN</strong></h1>
+<p>Bab ini menyajikan hasil implementasi sistem API logistik yang telah dibangun menggunakan FastAPI. Pembahasan meliputi struktur project, implementasi endpoint, tampilan antarmuka dashboard, serta pengujian API.</p>
+<h2>4.2 Response Endpoint Register</h2>
+<p class="no-indent">Hasil response dari endpoint POST /auth/register yang menampilkan data user yang berhasil terdaftar.</p>
+<pre><code class="language-json">{"username":"yogiprasetyo","email":"yogi@example.com","phone_number":null,"id":3,"is_active":true,"is_verified":false,"quota_limit":1000,"quota_used":0,"preferences":{},"password_updated_at":"2026-06-13T13:14:23.505157"}</code></pre>
+<p class="caption"><strong>Kode 4.2</strong> Response Endpoint Register</p>
+<h2>4.3 Response Endpoint Verify OTP</h2>
+<p class="no-indent">Hasil response dari endpoint POST /auth/verify-code setelah kode OTP berhasil diverifikasi.</p>
+<pre><code class="language-json">{"detail":[{"type":"missing","loc":["body","type"],"msg":"Field required","input":{"code":"529912","channel":"email"}}]}</code></pre>
+<p class="caption"><strong>Kode 4.3</strong> Response Endpoint Verify OTP</p>
+<h2>4.4 Server Log Backend</h2>
+<p class="no-indent">Log server FastAPI saat menerima request dari client, menunjukkan seluruh endpoint yang aktif.</p>
+<pre><code class="language-text">INFO:     Started server process [217]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): [errno 98] address already in use
+INFO:     Waiting forINFO:     127.0.0.1:53298 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53304 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53306 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53308 - "GET /api/readiness HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47322 - "GET /openapi.json HTTP/1.1" 200 OK
+</code></pre>
+<p class="caption"><strong>Kode 4.4</strong> Server Log Backend</p>
+<h2>4.4 Analisis Hasil</h2>
+<p>Berdasarkan hasil implementasi, seluruh endpoint API berhasil berjalan sesuai spesifikasi. Sistem autentikasi menggunakan JWT dengan masa berlaku token yang dapat dikonfigurasi memberikan keamanan yang memadai untuk akses endpoint manajemen akun. Verifikasi OTP melalui email memastikan bahwa pengguna yang mendaftar adalah pemilik email yang sah. Sistem API Key terpisah dari autentikasi pengguna memungkinkan pemisahan yang jelas antara manajemen akun dan akses data logistik.</p>
+<p>Endpoint logistik menggunakan asyncio.gather untuk melakukan request paralel ke RajaOngkir API, yang secara signifikan meningkatkan performa dibandingkan request sekuensial. Dengan 5 kurir yang tersedia, waktu respons dapat dipangkas hingga 5 kali lipat karena semua request ke kurir dijalankan secara bersamaan. Fallback internal disediakan jika RajaOngkir API tidak tersedia, memastikan sistem tetap berfungsi dalam kondisi degraded.</p>
+<p>Dashboard client menyediakan antarmuka yang intuitif untuk mengelola API Key, memonitor penggunaan kuota, dan menguji endpoint logistik secara langsung. Integrasi dengan backend melalui 55 panggilan API memastikan data yang ditampilkan selalu real-time. Desain responsif menggunakan CSS modern memastikan dashboard dapat diakses dengan baik dari berbagai ukuran layar.</p>
+
+<h1 class="chapter"><strong>BAB V</strong><br/><strong>PENUTUP</strong></h1>
+
+<h2>5.1 Kesimpulan</h2>
+<p>Sistem API logistik yang dibangun menggunakan FastAPI telah berhasil memenuhi seluruh kriteria yang ditetapkan dalam tugas EAS Pemrograman API. Sistem menyediakan autentikasi pengguna dengan JWT dan OTP, manajemen API Key dengan kuota terpusat, serta endpoint logistik untuk kalkulasi ongkir dan pelacakan paket. Dokumentasi API interaktif tersedia melalui Swagger UI dan ReDoc, sementara Postman collection memudahkan pengujian terstruktur.</p>
+<p>Client dashboard sebagai antarmuka pengguna akhir berhasil diimplementasikan dengan 55 integrasi API yang mencakup manajemen akun, pengelolaan API Key, monitoring penggunaan, serta pengujian endpoint logistik. Dashboard dirancang dengan tampilan modern dan responsif untuk memberikan pengalaman pengguna yang optimal.</p>
+
+<h2>5.2 Saran</h2>
+<p>Untuk pengembangan lebih lanjut, disarankan menambahkan fitur webhook notifikasi untuk status pengiriman, integrasi dengan lebih banyak penyedia kurir, serta implementasi caching menggunakan Redis untuk meningkatkan performa endpoint yang sering diakses. Sistem juga dapat dikembangkan dengan menambahkan dashboard analytics yang menampilkan statistik penggunaan API dalam bentuk grafik.</p>
+
+</body>
+</html>

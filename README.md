@@ -1,6 +1,6 @@
 # ShipStream — Logistics Rate & Tracking API
 
-Sistem API Logistik sederhana untuk cek tarif dan tracking paket sebagai syarat UTS Pemrograman API.
+Sistem API Logistik sederhana untuk cek tarif dan tracking paket sebagai syarat EAS Pemrograman API.
 
 ## 🌟 Fitur Utama (Advanced Version)
 - **Global Quota Pool**: Sistem prepaid terpusat. Kuota digunakan bersama oleh semua API Key dalam satu akun.

@@ -11,7 +11,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
-    # Untuk keperluan UTS, kita berikan fallback namun dengan peringatan di log console
+    # Untuk keperluan EAS, kita berikan fallback namun dengan peringatan di log console
     print("WARNING: SECRET_KEY not found in .env. Using insecure default. Please configure local .env!")
     SECRET_KEY = "yogi_prasetyo_uts_insecure_fallback"
 

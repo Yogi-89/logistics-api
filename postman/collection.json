@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "82e4212d-90f9-4601-aaf5-3bb372eb22f7",
-		"name": "Logistics Rate & Tracking API (UTS)",
-		"description": "Collection for testing Logistics API endpoints for UTS Pemrograman API.",
+		"name": "Logistics Rate & Tracking API (EAS)",
+		"description": "Collection for testing Logistics API endpoints for EAS Pemrograman API.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -13,10 +13,12 @@
 					"name": "Register",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\",\n    \"email\": \"test@example.com\"\n}",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\",\n    \"email\": \"test@example.com\",\n    \"captcha_token\": \"test-token\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -34,13 +36,18 @@
 					"name": "Login",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "X-Captcha-Token", "value": "test-token", "type": "text" }
+						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{ "key": "username", "value": "testuser", "type": "text" },
-								{ "key": "password", "value": "password123", "type": "text" }
-							]
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/login",
@@ -111,19 +118,44 @@
 				{
 					"name": "Check Cost",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
-							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"origin\": 1,\n    \"destination\": 2,\n    \"weight\": 1000,\n    \"courier\": \"jne\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
 						"url": {
-							"raw": "{{baseUrl}}/v1/cost?origin_id=1&destination_id=2&courier_code=jne",
+							"raw": "{{baseUrl}}/v1/cost",
 							"host": ["{{baseUrl}}"],
-							"path": ["v1", "cost"],
-							"query": [
-								{ "key": "origin_id", "value": "1" },
-								{ "key": "destination_id", "value": "2" },
-								{ "key": "courier_code", "value": "jne" }
-							]
+							"path": ["v1", "cost"]
+						}
+					}
+				},
+				{
+					"name": "Create Shipment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"courier_id\": 1,\n    \"origin_city_id\": 1,\n    \"destination_city_id\": 2,\n    \"service_type\": \"REG\",\n    \"weight_gram\": 1000,\n    \"sender_name\": \"Yogi Prasetyo\",\n    \"sender_phone\": \"081234567890\",\n    \"sender_address\": \"Jl. Testing No. 123, Jakarta\",\n    \"receiver_name\": \"Customer Satu\",\n    \"receiver_phone\": \"082345678901\",\n    \"receiver_address\": \"Jl. Penerima No. 456, Bandung\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/shipments",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "shipments"]
 						}
 					}
 				},
@@ -138,6 +170,56 @@
 							"raw": "{{baseUrl}}/v1/tracking/LGS-12345678",
 							"host": ["{{baseUrl}}"],
 							"path": ["v1", "tracking", "LGS-12345678"]
+						}
+					}
+				},
+				{
+					"name": "Update Tracking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/tracking/LGS-12345678/update?status=IN_TRANSIT&location=Jakarta&note=Package%20departed",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "tracking", "LGS-12345678", "update"],
+							"query": [
+								{ "key": "status", "value": "IN_TRANSIT" },
+								{ "key": "location", "value": "Jakarta" },
+								{ "key": "note", "value": "Package departed" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Generate Shipping Label",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/label/LGS-12345678?lang=id",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "label", "LGS-12345678"],
+							"query": [
+								{ "key": "lang", "value": "id" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Quota Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/quota",
+							"host": ["{{baseUrl}}"],
+							"path": ["v1", "quota"]
 						}
 					}
 				}

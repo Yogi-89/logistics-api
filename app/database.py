@@ -6,13 +6,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Gunakan env variable atau default ke postgresql://postgres:postgres@localhost:5432/logistics_api
+# Use SQLite for local testing; switch to PostgreSQL in production
 SQLALCHEMY_DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://postgres:postgres@localhost:5432/logistics_api"
+    "DATABASE_URL",
+    "sqlite:///./test_logistics.db"
 )
+# SQLite needs check_same_thread=False for FastAPI
+connect_args = {"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

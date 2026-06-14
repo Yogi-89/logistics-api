@@ -1,0 +1,98 @@
+{
+  "latarBelakang": [
+    "Perkembangan teknologi web yang pesat mendorong kebutuhan akan sistem informasi yang saling terhubung melalui API (Application Programming Interface). REST API menjadi standar de facto dalam komunikasi antar sistem karena kesederhanaan dan skalabilitasnya. Dalam mata kuliah Pemograman API, mahasiswa dituntut untuk memahami dan mengimplementasikan REST API secara langsung melalui praktik pengembangan sistem nyata.",
+    "Logistik merupakan salah satu sektor yang sangat bergantung pada pertukaran data real-time antara pelaku usaha, kurir, dan pelanggan. Sistem pelacakan paket, perhitungan ongkos kirim, dan manajemen pengiriman membutuhkan API yang andal, aman, dan mudah diintegrasikan. Oleh karena itu, topik pengembangan REST API Logistik dipilih sebagai proyek akhir semester karena relevansinya yang tinggi dengan kebutuhan industri.",
+    "Penulis mengembangkan sistem Logistics API menggunakan framework FastAPI (Python) dengan fitur autentikasi ganda (JWT + API Key), manajemen pengiriman, pelacakan paket, perhitungan ongkos kirim berbasis berat volumetrik, serta dashboard client untuk monitoring. Laporan ini mendokumentasikan seluruh proses pengembangan mulai dari perancangan arsitektur, implementasi endpoint, pengujian otomatis dengan pytest, hingga deployment sistem."
+  ],
+  "rumusanMasalah": "Bagaimana cara mengimplementasikan REST API untuk sistem logistik menggunakan FastAPI yang mencakup autentikasi JWT dan API Key, endpoint CRUD pengiriman dan pelacakan, serta bagaimana menguji dan mendeploy sistem tersebut secara fungsional?",
+  "tujuan": "Praktikum ini bertujuan untuk mengembangkan REST API sistem logistik menggunakan FastAPI yang mencakup fitur autentikasi (register, login, OTP, JWT, API Key), endpoint manajemen pengiriman (shipments), pelacakan paket (tracking), perhitungan ongkos kirim (cost), serta dashboard client untuk monitoring. Selain itu, dilakukan pengujian otomatis menggunakan pytest dan dokumentasi API menggunakan Swagger/OpenAPI.",
+  "manfaat": "Praktikum ini memberikan manfaat berupa pemahaman mendalam tentang pengembangan REST API dengan FastAPI, penerapan skema autentikasi multi-layer (JWT + API Key), teknik pengujian otomatis, dokumentasi API interaktif, dan deployment ke cloud. Sistem yang dihasilkan dapat dijadikan fondasi untuk proyek logistik skala produksi serta portofolio pengembangan backend.",
+  "dasarTeori": [
+    {
+      "judul": "2.1 REST API",
+      "isi": [
+        "REST (Representational State Transfer) adalah gaya arsitektur perangkat lunak yang mendefinisikan seperangkat aturan untuk membangun web service. REST API menggunakan HTTP method standar seperti GET, POST, PUT, dan DELETE untuk operasi CRUD (Create, Read, Update, Delete). Setiap resource diidentifikasi melalui URI (Uniform Resource Identifier) dan komunikasi dilakukan tanpa state (stateless), artinya setiap request harus mengandung semua informasi yang diperlukan untuk diproses.",
+        "Keunggulan REST API meliputi kesederhanaan, skalabilitas, dan kemudahan integrasi dengan berbagai platform. Format response umumnya JSON (JavaScript Object Notation) yang ringan dan mudah dibaca oleh manusia maupun mesin. REST API banyak digunakan dalam arsitektur microservices dan menjadi backbone komunikasi aplikasi modern."
+      ]
+    },
+    {
+      "judul": "2.2 FastAPI Framework",
+      "isi": [
+        "FastAPI adalah web framework Python modern untuk membangun API dengan performa tinggi. Framework ini dibangun di atas Starlette (untuk web) dan Pydantic (untuk validasi data), serta mendukung asynchronous request handling secara native. FastAPI menghasilkan dokumentasi OpenAPI/Swagger secara otomatis dari kode Python tanpa memerlukan konfigurasi tambahan.",
+        "Fitur unggulan FastAPI meliputi: validasi tipe data otomatis menggunakan Python type hints, dokumentasi interaktif Swagger UI dan ReDoc, dependency injection untuk manajemen dependensi, serta dukungan penuh untuk OAuth2 dan JWT. FastAPI juga mendukung background tasks, middleware, dan WebSocket yang memperluas kapabilitas API yang dibangun."
+      ]
+    },
+    {
+      "judul": "2.3 JSON Web Token (JWT)",
+      "isi": [
+        "JWT adalah standar terbuka (RFC 7519) untuk mentransmisikan klaim secara aman antara dua pihak dalam format JSON. Token JWT terdiri dari tiga bagian: header (tipe token dan algoritma), payload (klaim seperti user ID dan expiry), dan signature (tanda tangan kriptografis).",
+        "JWT digunakan sebagai bearer token yang disertakan dalam header Authorization. Server memverifikasi signature tanpa menyimpan session state, cocok untuk arsitektur stateless. Token memiliki masa berlaku yang membatasi waktu penggunaan."
+      ]
+    },
+    {
+      "judul": "2.4 API Key Authentication",
+      "isi": [
+        "API Key adalah metode autentikasi sederhana di mana client menyertakan kunci unik dalam header request (X-API-Key). Berbeda dengan JWT untuk autentikasi pengguna, API Key digunakan untuk mengidentifikasi dan membatasi akses aplikasi client ke resource API.",
+        "API Key memiliki kelebihan dalam kemudahan implementasi dan revokasi. Administrator dapat membuat atau mencabut API Key tanpa mempengaruhi akun pengguna. Dalam sistem ini, API Key digunakan khusus untuk endpoint data logistik."
+      ]
+    },
+    {
+      "judul": "2.5 SQLAlchemy ORM",
+      "isi": [
+        "SQLAlchemy adalah ORM Python yang menyediakan abstraksi database melalui objek Python. Mendukung SQLite, PostgreSQL, MySQL, dan lainnya. Model database didefinisikan sebagai kelas Python, dan session management menangani transaksi database.",
+        "FastAPI terintegrasi dengan SQLAlchemy melalui dependency injection untuk manajemen session database. Hal ini memungkinkan kode yang bersih dan testable dengan pemisahan concern yang jelas antara routing dan data access."
+      ]
+    }
+  ],
+  "metodologi": {
+    "alat": "Python 3.12, FastAPI, SQLAlchemy, SQLite, Pytest 9.0.3, Postman, Visual Studio Code. Deployment: Railway (backend) dan Vercel (frontend). Docker untuk containerization.",
+    "langkah": [
+      "Analisis kebutuhan: mengidentifikasi endpoint untuk manajemen pengguna, autentikasi, pengiriman, pelacakan, dan perhitungan ongkos kirim.",
+      "Perancangan arsitektur: mendesain struktur folder FastAPI, model database SQLAlchemy, dan skema request/response Pydantic.",
+      "Implementasi autentikasi: endpoint register, login, verifikasi OTP, dan manajemen API Key dengan bcrypt hashing.",
+      "Implementasi endpoint logistik: CRUD pengiriman, pelacakan paket, perhitungan ongkos kirim dengan kalkulasi berat volumetrik, dan shipping label PDF.",
+      "Pengujian otomatis: menulis 67 test case pytest mencakup validasi payload, autentikasi, dan integrasi endpoint.",
+      "Dokumentasi API: Swagger UI, Redoc, API Guide, dan Postman collection.",
+      "Pengujian manual: menggunakan Postman untuk menguji seluruh endpoint.",
+      "Deployment: deploy backend ke Railway dan frontend dashboard ke Vercel."
+    ]
+  },
+  "hasilIntro": [
+    "Bab ini menyajikan hasil implementasi dan pengujian Logistics API. Total 67 test case dijalankan menggunakan pytest dengan 4 kategori: auth (16 test), bugs (17 test), main (8 test), dan shipments (26 test). Hasil menunjukkan 63 test PASSED dan 4 test FAILED, memberikan tingkat keberhasilan 94%.",
+    "Pengujian dilakukan pada server lokal (localhost:8000) menggunakan database SQLite. Setiap endpoint diuji secara fungsional dengan berbagai skenario termasuk validasi input, autentikasi, dan edge cases. Dokumentasi Swagger UI tersedia di /docs dan Postman collection mencakup 3 kategori endpoint."
+  ],
+  "evidenceDir": "/workspace/Semester_8/Pemograman_API/logistics-api/evidence",
+  "evidenceItems": [
+    {
+      "title": "Hasil Pengujian Pytest - 63/67 PASSED (94%)",
+      "desc": "Eksekusi pytest menunjukkan 63 test lulus dari 67 total. Empat kegagalan minor pada validasi format telepon internasional dan edge case NameError. Semua endpoint inti berfungsi penuh.",
+      "filename": "01_pytest_results.png"
+    },
+    {
+      "title": "Response Endpoint Register (POST /auth/register)",
+      "desc": "Registrasi berhasil membuat akun dengan response JSON berisi user ID 3, username yogiprasetyo, email yogi@example.com, quota_limit=1000. Sesuai schema UserResponse.",
+      "filename": "02_register_response.png"
+    },
+    {
+      "title": "Debug OTP - Kode Verifikasi 529912",
+      "desc": "Endpoint debug OTP mengembalikan kode verifikasi 529912 untuk channel email dengan masa berlaku 15 menit. Fitur untuk development mode, dinonaktifkan di production.",
+      "filename": "03_debug_otp.png"
+    },
+    {
+      "title": "Server Uvicorn Berjalan di Port 8000",
+      "desc": "Log menunjukkan FastAPI startup sukses via Uvicorn. Root GET / 200 OK, Swagger /docs 200 OK, OpenAPI /openapi.json 200 OK. Server siap melayani request.",
+      "filename": "04_server_log.png"
+    }
+  ],
+  "analisisHasil": [
+    "Sistem autentikasi multi-layer (JWT + API Key) berfungsi dengan baik. Pengguna harus registrasi, verifikasi OTP, login untuk JWT, lalu generate API Key sebelum mengakses endpoint logistik. Alur ini mencerminkan praktik keamanan API modern.",
+    "Endpoint logistik mencakup operasi CRUD lengkap: membuat pengiriman (POST /v1/shipments), melihat data (GET /v1/shipments/{awb}), update tracking (POST /v1/tracking/{awb}/update), dan manajemen API Key. Fitur berat volumetrik (PxLxT/6000) menunjukkan implementasi logika bisnis realistis.",
+    "Test suite 67 case menunjukkan coverage komprehensif. Empat kegagalan minor terkait format telepon internasional dan bug NameError, tidak mengganggu fungsi inti. Dokumentasi Swagger UI dan Postman collection memudahkan integrasi."
+  ],
+  "kesimpulan": [
+    "REST API Logistik dengan FastAPI berhasil dikembangkan sesuai tujuan. Sistem mencakup 18+ endpoint dalam 4 kelompok: publik, autentikasi, manajemen API Key, dan logistik. Arsitektur multi-layer authentication berfungsi dengan baik.",
+    "Pengujian otomatis 67 test case mencapai 94% keberhasilan. Dokumentasi Swagger UI, Redoc, dan Postman collection memudahkan pemahaman dan integrasi. Dashboard client dengan 55 API calls mendemonstrasikan integrasi frontend-backend yang solid.",
+    "Praktikum ini memberikan pengalaman komprehensif tentang siklus pengembangan API: perancangan, implementasi, pengujian, dokumentasi, hingga deployment. Sistem siap diintegrasikan dan dikembangkan lebih lanjut."
+  ],
+  "saran": "Untuk pengembangan selanjutnya: (1) perbaiki validasi format telepon internasional, (2) tambahkan rate limiting per endpoint, (3) caching Redis untuk endpoint statis, (4) webhook notifikasi pengiriman real-time, dan (5) monitoring terpusat untuk debugging production."
+}

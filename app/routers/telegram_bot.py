@@ -29,7 +29,7 @@ async def telegram_webhook(bot_token: str, request: Request, db: Session = Depen
     # Find user by Telegram Chat ID stored in preferences
     # Preferences is a JSON column, so we query it using cast or contains logic
     # In SQLite/PostgreSQL, we can fetch all users with telegram settings and check in memory
-    # for simplicity in this UTS project, or use JSON query if database supports it.
+    # for simplicity in this EAS project, or use JSON query if database supports it.
     
     target_user = None
     all_users = db.query(models.User).all()

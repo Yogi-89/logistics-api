@@ -1,0 +1,1 @@
+{"detail":[{"type":"missing","loc":["body","type"],"msg":"Field required","input":{"code":"529912","channel":"email"}}]}

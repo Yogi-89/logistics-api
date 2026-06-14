@@ -48,7 +48,7 @@ def generate_otp(length: int = 6):
 def create_verification_code(db: Session, user_id: int, channel: str, code_type: str = "registration"):
     """
     Creates a new verification code in the database and 'sends' it.
-    (Simulated delivery to console for local UTS testing).
+    (Simulated delivery to console for local EAS testing).
     """
     code = generate_otp()
     expires_at = datetime.utcnow() + timedelta(minutes=15)

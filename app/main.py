@@ -14,7 +14,7 @@ from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(
     title="Logistics Rate & Tracking API",
-    description="API for checking shipping rates and tracking packages (UTS Semester 6)",
+    description="API for checking shipping rates and tracking packages (EAS Semester 8)",
     version="1.0.0"
 )
 
