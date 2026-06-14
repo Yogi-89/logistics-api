@@ -18,8 +18,13 @@ load_dotenv()
 # access to the values within the .ini file in use.
 config = context.config
 
-# Set the database URL from environment variable
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+# Set the database URL from environment variable. Railway deployments should
+# provide DATABASE_URL via a PostgreSQL service, but keep a SQLite fallback so
+# local/demo deployments do not crash before uvicorn starts.
+config.set_main_option(
+    "sqlalchemy.url",
+    os.getenv("DATABASE_URL", "sqlite:///./test_logistics.db")
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
