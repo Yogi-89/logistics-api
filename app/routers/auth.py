@@ -9,6 +9,7 @@ from app.utils.security_utils import verify_turnstile, create_verification_code
 from datetime import datetime, timedelta
 import os
 from pydantic import BaseModel
+from app.utils.env import get_bool_env
 
 class LoginJSON(BaseModel):
     username: str
@@ -184,7 +185,7 @@ def debug_test_ping():
     """
     Utility endpoint for the frontend to check if debug mode is active/accessible.
     """
-    if os.getenv("DEBUG_MODE") != "True":
+    if not get_bool_env("DEBUG_MODE"):
         raise HTTPException(status_code=403, detail="Debug features disabled")
     return {"status": "ok", "mode": "debug"}
 
@@ -194,7 +195,7 @@ def get_debug_otp(username: str, db: Session = Depends(get_db)):
     DEBUG ONLY: Get the latest active OTP for a user.
     Disabled in production (requires DEBUG_MODE=True in .env).
     """
-    if os.getenv("DEBUG_MODE") != "True":
+    if not get_bool_env("DEBUG_MODE"):
         raise HTTPException(status_code=403, detail="Debug endpoint is disabled in production")
     
     user = db.query(models.User).filter(models.User.username == username).first()

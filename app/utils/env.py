@@ -46,3 +46,18 @@ def get_int_env(name: str, default: int) -> int:
     except ValueError:
         print(f"[Config] WARNING: invalid integer for {name}; using {default}.")
         return default
+
+
+def get_bool_env(name: str, default: bool = False) -> bool:
+    value = clean_env(name)
+    if value is None:
+        return default
+
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+
+    print(f"[Config] WARNING: invalid boolean for {name}; using {default}.")
+    return default
