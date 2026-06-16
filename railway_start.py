@@ -24,11 +24,18 @@ def seed_reference_data_if_empty() -> None:
         seed()
 
 
+def seed_rajaongkir_ids_if_missing() -> None:
+    from seed_rajaongkir_ids import seed
+
+    seed()
+
+
 def prepare_database() -> None:
     database_url = get_database_url()
     if not database_url.startswith("sqlite"):
         subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], check=True)
         seed_reference_data_if_empty()
+        seed_rajaongkir_ids_if_missing()
         return
 
     from app.database import Base, engine
@@ -36,6 +43,7 @@ def prepare_database() -> None:
 
     Base.metadata.create_all(bind=engine)
     seed_reference_data_if_empty()
+    seed_rajaongkir_ids_if_missing()
 
 
 if __name__ == "__main__":
