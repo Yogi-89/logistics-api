@@ -1,0 +1,109 @@
+{
+  "latarBelakang": [
+    "Perkembangan aplikasi modern membuat API menjadi penghubung utama antar sistem. Pada MK Pemograman API, pemahaman tersebut tidak cukup berhenti pada teori, tetapi perlu dibuktikan melalui pembangunan layanan API yang dapat digunakan oleh client secara nyata.",
+    "Bidang logistik dipilih karena prosesnya dekat dengan kebutuhan API: pengecekan kota, pilihan kurir, perhitungan ongkos kirim, pembuatan resi, dan pelacakan pengiriman. Proses tersebut membutuhkan autentikasi, pembatasan akses, dokumentasi endpoint, dan pengujian yang jelas.",
+    "Penulis membangun ShipStream - Logistics Rate & Tracking API menggunakan FastAPI. Sistem ini menyediakan registrasi akun, verifikasi OTP, login JWT, pembuatan API Key, endpoint logistik, dokumentasi Swagger, web client, serta pengujian otomatis dan manual melalui Postman."
+  ],
+  "rumusanMasalah": "Bagaimana membangun website penyedia API berbasis database lokal yang memiliki login, API Key, autentikasi, operasi CRUD, dokumentasi penggunaan, web client, serta dapat diuji menggunakan Postman sesuai kebutuhan UAS Pemograman API?",
+  "tujuan": "Tujuan pengerjaan ini adalah mengembangkan Logistics API berbasis FastAPI yang memenuhi requirement UAS, mulai dari autentikasi akun, manajemen API Key, endpoint data logistik, dokumentasi, web client, pengujian Postman, hingga deployment.",
+  "manfaat": "Pengerjaan ini bermanfaat untuk memperkuat pemahaman penulis mengenai siklus pengembangan API dari analisis kebutuhan, implementasi backend, validasi keamanan sederhana, dokumentasi, pengujian, sampai deployment.",
+  "dasarTeori": [
+    {
+      "judul": "2.1 REST API",
+      "isi": [
+        "REST API adalah gaya arsitektur web service yang memanfaatkan HTTP method seperti GET, POST, PUT, PATCH, dan DELETE untuk mengelola resource. Setiap resource diakses melalui endpoint dan umumnya mengirimkan response dalam format JSON.",
+        "Pada proyek ini REST API digunakan sebagai antarmuka utama antara sistem penyedia layanan logistik dan web client. Client tidak mengakses database secara langsung, melainkan melalui endpoint yang sudah divalidasi."
+      ]
+    },
+    {
+      "judul": "2.2 FastAPI",
+      "isi": [
+        "FastAPI adalah framework Python untuk membangun API modern. Framework ini mendukung validasi schema menggunakan Pydantic, dependency injection, middleware, serta dokumentasi otomatis berbasis OpenAPI.",
+        "FastAPI dipilih karena proses pengembangannya cepat, dokumentasinya terbentuk otomatis di Swagger UI, dan cocok untuk membangun backend API yang membutuhkan validasi request secara ketat."
+      ]
+    },
+    {
+      "judul": "2.3 JWT dan API Key",
+      "isi": [
+        "JWT digunakan untuk membuktikan identitas pengguna setelah login. Token dikirim melalui header Authorization dan diverifikasi server tanpa menyimpan session di memori.",
+        "API Key digunakan untuk mengakses endpoint logistik. Pemisahan JWT dan API Key membuat alur lebih rapi: JWT dipakai untuk manajemen akun, sedangkan API Key dipakai untuk konsumsi layanan API."
+      ]
+    },
+    {
+      "judul": "2.4 SQLAlchemy dan Database Lokal",
+      "isi": [
+        "SQLAlchemy adalah ORM Python yang memetakan tabel database menjadi objek Python. Dengan ORM, operasi database dapat ditulis lebih terstruktur dan mudah diuji.",
+        "Pada proyek ini database lokal digunakan untuk menyimpan user, API key, data kota, kurir, tracking, transaksi, dan konfigurasi lain yang dibutuhkan sistem."
+      ]
+    }
+  ],
+  "metodologi": {
+    "alat": "Python 3.13, FastAPI, SQLAlchemy, SQLite, Pytest, Postman, Visual Studio Code, Railway, dan browser untuk menguji web client.",
+    "langkah": [
+      "Menganalisis requirement UAS dari file EAS API 2526.pdf.",
+      "Mendesain struktur backend FastAPI, database model, schema Pydantic, dan route aplikasi.",
+      "Membangun fitur autentikasi akun berupa register, verifikasi OTP, login JWT, dan generate API Key.",
+      "Membangun endpoint logistik seperti daftar kurir, daftar kota, perhitungan ongkos kirim, shipment, tracking, label PDF, dan quota.",
+      "Membuat dokumentasi Swagger/OpenAPI, file API guide, Postman collection, landing page, dan dashboard client.",
+      "Melakukan pengujian otomatis menggunakan pytest dan pengujian manual menggunakan Postman.",
+      "Menyiapkan deployment serta arsip program untuk pengumpulan."
+    ]
+  },
+  "hasilIntro": [
+    "Pengujian dilakukan melalui dua pendekatan, yaitu pengujian otomatis menggunakan pytest dan pengujian manual menggunakan Postman. Hasil pengujian otomatis terbaru menunjukkan 67 test berhasil lulus.",
+    "Pengujian manual Postman dilakukan sesuai alur pemakaian API: register, ambil OTP debug, verifikasi OTP, login, generate API Key, kemudian menggunakan API Key untuk endpoint data logistik."
+  ],
+  "evidenceDir": "C:\\Users\\Developer\\Documents\\Semester_8\\Pemograman_API\\logistics-api\\bukti_pengujian",
+  "evidenceItems": [
+    {
+      "title": "Register Akun Melalui Postman",
+      "desc": "endpoint POST /auth/register berhasil membuat akun uji",
+      "filename": "bukti register postman.png"
+    },
+    {
+      "title": "Ambil OTP Debug",
+      "desc": "endpoint GET /auth/debug/otp/{username} mengembalikan kode OTP saat mode debug",
+      "filename": "bukti ambil otp postman.png"
+    },
+    {
+      "title": "Verifikasi OTP",
+      "desc": "endpoint POST /auth/verify-code berhasil memverifikasi akun",
+      "filename": "bukti verifikasi otp postman.png"
+    },
+    {
+      "title": "Login dan Penerbitan JWT",
+      "desc": "endpoint POST /auth/login mengembalikan access token",
+      "filename": "bukti login postman.png"
+    },
+    {
+      "title": "Pembuatan API Key",
+      "desc": "endpoint POST /apikey/generate berhasil membuat API Key",
+      "filename": "bukti create api key postman.png"
+    },
+    {
+      "title": "Daftar Kurir",
+      "desc": "endpoint GET /v1/couriers berhasil diakses menggunakan X-API-Key",
+      "filename": "bukti ambil data courier postman.png"
+    },
+    {
+      "title": "Daftar Kota",
+      "desc": "endpoint GET /v1/cities berhasil mengembalikan data kota",
+      "filename": "bukti ambil data kota postman.png"
+    },
+    {
+      "title": "Perhitungan Ongkos Kirim",
+      "desc": "endpoint POST /v1/cost berhasil menghitung ongkos kirim",
+      "filename": "bukti ambil data cost postman.png"
+    }
+  ],
+  "analisisHasil": [
+    "Alur autentikasi berjalan utuh. Pengguna melakukan registrasi, mengambil OTP pada mode debug, memverifikasi akun, login untuk memperoleh JWT, lalu membuat API Key untuk mengakses endpoint logistik.",
+    "Endpoint logistik utama dapat diakses menggunakan header X-API-Key. Pengujian Postman membuktikan API dapat menampilkan data kurir, data kota, dan menghitung ongkos kirim.",
+    "Hasil pytest 67 passed menunjukkan fungsi utama aplikasi sudah stabil untuk kebutuhan demonstrasi dan pengumpulan UAS."
+  ],
+  "kesimpulan": [
+    "ShipStream - Logistics Rate & Tracking API berhasil dikembangkan sesuai requirement UAS Pemograman API. Sistem menyediakan website penyedia API, database lokal, login, API Key, autentikasi JWT/API Key, endpoint data logistik, dokumentasi, dan web client.",
+    "Pengujian otomatis menghasilkan 67 passed, sedangkan pengujian manual Postman membuktikan alur penggunaan API berjalan dari registrasi sampai perhitungan ongkos kirim."
+  ],
+  "saran": "Untuk pengembangan berikutnya, sistem dapat diarahkan ke PostgreSQL production, Redis permanen untuk rate limiting, pengamanan endpoint debug OTP, serta monitoring deployment yang lebih lengkap."
+}
