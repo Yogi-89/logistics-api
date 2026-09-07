@@ -3,6 +3,10 @@
 Revision ID: a2a881502525
 Revises:
 Create Date: 2026-09-08
+
+NOTE: This baseline intentionally excludes objects introduced by later migrations:
+- d17833179374: subdistricts + enriched tracking columns
+- 14f712e39967: cities.rajaongkir_id
 """
 
 from typing import Sequence, Union
@@ -73,7 +77,6 @@ def upgrade() -> None:
         sa.Column("province", sa.String(), nullable=True),
         sa.Column("type", sa.String(), nullable=True),
         sa.Column("postal_code", sa.String(), nullable=True),
-        sa.Column("rajaongkir_id", sa.Integer(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
@@ -93,16 +96,6 @@ def upgrade() -> None:
     op.create_index("ix_couriers_id", "couriers", ["id"], unique=False)
 
     op.create_table(
-        "subdistricts",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=True),
-        sa.Column("city_id", sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(["city_id"], ["cities.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_index("ix_subdistricts_id", "subdistricts", ["id"], unique=False)
-
-    op.create_table(
         "tracking",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("awb", sa.String(), nullable=True),
@@ -110,25 +103,11 @@ def upgrade() -> None:
         sa.Column("status", sa.String(), nullable=True),
         sa.Column("origin_city_id", sa.Integer(), nullable=True),
         sa.Column("destination_city_id", sa.Integer(), nullable=True),
-        sa.Column("service_type", sa.String(), nullable=True),
-        sa.Column("weight_gram", sa.Integer(), nullable=True),
-        sa.Column("length_cm", sa.Integer(), nullable=True),
-        sa.Column("width_cm", sa.Integer(), nullable=True),
-        sa.Column("height_cm", sa.Integer(), nullable=True),
-        sa.Column("insurance_value", sa.Float(), nullable=True),
-        sa.Column("shipping_cost", sa.Float(), nullable=True),
         sa.Column("sender_name", sa.String(), nullable=True),
         sa.Column("sender_phone", sa.String(), nullable=True),
-        sa.Column("sender_address", sa.String(), nullable=True),
-        sa.Column("sender_postal_code", sa.String(), nullable=True),
-        sa.Column("sender_lat", sa.Float(), nullable=True),
-        sa.Column("sender_long", sa.Float(), nullable=True),
         sa.Column("receiver_name", sa.String(), nullable=True),
         sa.Column("receiver_phone", sa.String(), nullable=True),
         sa.Column("receiver_address", sa.String(), nullable=True),
-        sa.Column("receiver_postal_code", sa.String(), nullable=True),
-        sa.Column("receiver_lat", sa.Float(), nullable=True),
-        sa.Column("receiver_long", sa.Float(), nullable=True),
         sa.Column("last_updated", sa.DateTime(), nullable=True),
         sa.Column("history", sa.JSON(), nullable=True),
         sa.ForeignKeyConstraint(["courier_id"], ["couriers.id"]),
@@ -215,9 +194,6 @@ def downgrade() -> None:
     op.drop_index("ix_tracking_awb", table_name="tracking")
     op.drop_index("ix_tracking_id", table_name="tracking")
     op.drop_table("tracking")
-
-    op.drop_index("ix_subdistricts_id", table_name="subdistricts")
-    op.drop_table("subdistricts")
 
     op.drop_index("ix_couriers_id", table_name="couriers")
     op.drop_table("couriers")
