@@ -1072,6 +1072,25 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                     </div>
                 </div>
 
+                <div id="qris-inline-preview"
+                    style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: center;">
+                    <div id="qris-inline-loading" style="font-size: 0.8rem; color: var(--text-secondary);">Memuat QRIS...</div>
+                    <div id="qris-inline-body" style="display: none;">
+                        <div
+                            style="display: inline-block; background: #ffffff; padding: 0.75rem; border-radius: 0.75rem;">
+                            <img id="qris-inline-image" src="" alt="QRIS"
+                                style="width: 180px; height: 180px; object-fit: contain; display: block;">
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Merchant: <span id="qris-inline-merchant" style="color: var(--text-primary); font-weight: 600;"></span>
+                        </div>
+                        <div id="qris-inline-missing"
+                            style="display: none; font-size: 0.75rem; color: #f59e0b; margin-top: 0.5rem;">
+                            Gambar QRIS belum tersedia. Hubungi admin.
+                        </div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                     <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeTopupModal()"
                         data-i18n="btn_cancel">Batal</button>
@@ -1190,6 +1209,10 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             <div class="glass" style="padding: 1rem; background: #ffffff; display: inline-block; border-radius: 0.75rem;">
                 <img id="qris-qr-image" src="" alt="QRIS"
                     style="width: 220px; height: 220px; object-fit: contain; display: block;">
+            </div>
+            <div id="qris-image-warning"
+                style="display: none; font-size: 0.75rem; color: #f59e0b; margin-top: 0.5rem;">
+                Gambar QRIS gagal dimuat. Hubungi admin atau refresh halaman.
             </div>
 
             <div class="glass" style="padding: 1rem; margin-top: 1.25rem; background: rgba(0,0,0,0.2);">
@@ -3501,6 +3524,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                             }
 
                             const isCrypto = tx.payment_method === 'crypto';
+                            const isQris = tx.payment_method === 'qris';
+                            const canShowQris = isQris && ['pending', 'awaiting_verification'].includes(tx.status);
                             const isPending = tx.status === 'pending';
                             const canCancel = tx.status === 'pending';
 
@@ -3544,11 +3569,18 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                             ${tx.tx_metadata?.chain || 'Base'} &middot; ${tx.tx_metadata?.symbol || 'USDC'}
                                         </div>
                                     ` : ''}
+                                    ${isQris ? `
+                                        <div style="font-size: 0.7rem; color: #818cf8; margin-top: 0.25rem; display: flex; align-items: center; gap: 4px;">
+                                            <i data-lucide="qr-code" style="width:12px;height:12px;"></i>
+                                            QRIS &middot; ${tx.tx_metadata?.merchant || 'Merchant'}
+                                        </div>
+                                    ` : ''}
                                     ${reasonHtml}
                                 </div>
                                 <div style="text-align: right; flex-shrink:0; margin-left:1rem;">
                                     <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">${formatAmount(tx.amount || 0)}</div>
                                     <div style="margin-top: 0.5rem; display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center;">
+                                        ${canShowQris ? `<button onclick="openQrisFromHistory(${idx})" class="btn-outline" style="font-size:0.7rem; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(129, 140, 248, 0.5); background: transparent; color: #818cf8; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(129, 140, 248, 0.12)'" onmouseout="this.style.background='transparent'">Lihat QRIS</button>` : ''}
                                         ${canCancel ? `<button onclick="cancelOrder('${tx.order_id}')" class="btn-outline" style="font-size:0.7rem; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3); background: transparent; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(239, 68, 68, 0.3)'">${t('btn_cancel')}</button>` : ''}
                                         <span onclick='showTxStatusInfoFromEl(this)' 
                                               data-tx-idx='${idx}'
@@ -3932,6 +3964,50 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             document.getElementById('pay-crypto').style.borderColor = method === 'crypto' ? 'var(--accent)' : 'var(--border-color)';
             document.getElementById('pay-qris').style.borderColor = method === 'qris' ? 'var(--accent)' : 'var(--border-color)';
             document.getElementById('crypto-options').style.display = method === 'crypto' ? 'block' : 'none';
+            document.getElementById('qris-inline-preview').style.display = method === 'qris' ? 'block' : 'none';
+            if (method === 'qris') loadQrisPreview();
+        }
+
+        // Cache the public QRIS config so the QR can be shown before an order exists.
+        async function loadQrisPreview() {
+            const loading = document.getElementById('qris-inline-loading');
+            const body = document.getElementById('qris-inline-body');
+            try {
+                if (!window._qrisConfig) {
+                    const res = await fetch(`${API_URL}/v1/billing/qris-config`);
+                    if (!res.ok) throw new Error('config ' + res.status);
+                    window._qrisConfig = await res.json();
+                }
+                const cfg = window._qrisConfig;
+                const img = document.getElementById('qris-inline-image');
+                const missing = document.getElementById('qris-inline-missing');
+                missing.style.display = 'none';
+                img.onerror = () => {
+                    img.onerror = null;
+                    img.style.display = 'none';
+                    missing.style.display = 'block';
+                };
+                img.onload = () => { img.style.display = 'block'; };
+                img.src = cfg.qr_image_url;
+                document.getElementById('qris-inline-merchant').innerText = cfg.merchant || '';
+                loading.style.display = 'none';
+                body.style.display = 'block';
+            } catch (err) {
+                console.error('Failed to load QRIS config:', err);
+                loading.style.display = 'none';
+                body.style.display = 'block';
+                document.getElementById('qris-inline-image').style.display = 'none';
+                document.getElementById('qris-inline-missing').style.display = 'block';
+            }
+        }
+
+        function openQrisFromHistory(idx) {
+            const tx = (window._billingCache || [])[idx];
+            if (!tx || tx.payment_method !== 'qris') {
+                showToast('Transaksi QRIS tidak ditemukan.', 'error');
+                return;
+            }
+            showQrisCheckout(tx);
         }
 
         function selectOTPChannel(value, element) {
@@ -4026,18 +4102,31 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             const meta = tx.tx_metadata || {};
             window.activeQrisOrderId = tx.order_id;
             const img = document.getElementById('qris-qr-image');
-            img.src = meta.qr_image_url || '/assets/img/qrcodes/qris_static.svg';
+            const warn = document.getElementById('qris-image-warning');
+            const src = meta.qr_image_url || (window._qrisConfig && window._qrisConfig.qr_image_url) || '/assets/img/qrcodes/qris_static.svg';
+            warn.style.display = 'none';
+            img.style.display = 'block';
             img.onerror = () => {
                 img.onerror = null;
-                img.src = '/assets/img/qrcodes/qris_static.svg';
+                img.style.display = 'none';
+                warn.style.display = 'block';
             };
+            img.src = src;
             document.getElementById('qris-amount').innerText = 'Rp ' + Number(tx.amount || 0).toLocaleString('id-ID');
-            document.getElementById('qris-merchant').innerText = meta.merchant || '';
+            document.getElementById('qris-merchant').innerText = meta.merchant || (window._qrisConfig && window._qrisConfig.merchant) || '';
             document.getElementById('qris-order-id').innerText = tx.order_id;
             document.getElementById('qris-note').value = '';
             const btn = document.getElementById('btn-submit-qris');
-            btn.disabled = false;
-            btn.innerText = 'Saya Sudah Bayar';
+            if (tx.status === 'awaiting_verification') {
+                btn.disabled = true;
+                btn.innerText = 'Menunggu verifikasi admin';
+            } else if (tx.status === 'success') {
+                btn.disabled = true;
+                btn.innerText = 'Pembayaran sudah dikonfirmasi';
+            } else {
+                btn.disabled = false;
+                btn.innerText = 'Saya Sudah Bayar';
+            }
             openModal('qris-checkout-modal');
             lucide.createIcons();
         }
@@ -4109,11 +4198,20 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
                 const data = await res.json();
 
-                if (res.ok) {
-                    showToast('toast_verify_success', 'success');
+                // The backend answers 200 for every verification outcome, so the toast must
+                // follow data.status instead of res.ok (a wrong TXID is still HTTP 200).
+                if (res.ok && data.status === 'success') {
+                    showToast('Pembayaran berhasil diverifikasi. Kuota sudah ditambahkan.', 'success');
                     closeCryptoCheckout();
                     loadUserProfile();
                     loadKeys();
+                    if (typeof loadBillingHistory === 'function') loadBillingHistory();
+                } else if (res.ok && data.status === 'pending') {
+                    showToast('Transaksi ditemukan tetapi belum terkonfirmasi di jaringan. Cek riwayat beberapa menit lagi.', 'warning');
+                    loadUserProfile();
+                    if (typeof loadBillingHistory === 'function') loadBillingHistory();
+                } else if (res.ok) {
+                    showToast(data.message || 'Verifikasi gagal: TXID tidak cocok dengan pembayaran yang diharapkan.', 'error');
                     if (typeof loadBillingHistory === 'function') loadBillingHistory();
                 } else {
                     // Show specific error message from backend if available (e.g. duplicate TXID)

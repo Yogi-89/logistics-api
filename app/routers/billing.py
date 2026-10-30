@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 import os
 from sqlalchemy.orm import Session
 from typing import List
@@ -77,6 +77,19 @@ def get_admin_contact():
         "email": os.getenv("ADMIN_EMAIL", "admin@shipstream.dev"),
         "whatsapp": os.getenv("ADMIN_WHATSAPP", ""),
         "whatsapp_url": f"https://wa.me/{os.getenv('ADMIN_WHATSAPP', '').replace('+', '').replace('-', '').replace(' ', '')}"
+    }
+
+@router.get("/qris-config", tags=["Public Config"])
+def get_qris_config():
+    """
+    Public endpoint: returns the static QRIS image and merchant label so the dashboard can
+    render the QR before an order exists.
+    """
+    return {
+        "qr_image_url": os.getenv("QRIS_IMAGE_URL", "/assets/img/qrcodes/qris_static.svg"),
+        "merchant": os.getenv("QRIS_MERCHANT_NAME", "ShipStream Logistics"),
+        "currency": "IDR",
+        "instructions": "Scan the QRIS code, pay the exact amount, then press 'Saya sudah bayar'.",
     }
 
 @router.post("/topup", response_model=schemas.Transaction)
@@ -255,14 +268,21 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
     elif verification["status"] == "pending":
         try:
             tx.status = "awaiting_verification"
+            tx.status_reason = "Menunggu konfirmasi jaringan"
             db.commit()
         except Exception:
             db.rollback()
+        return {
+            "message": "Transaksi ditemukan tetapi belum terkonfirmasi. Coba lagi beberapa menit.",
+            "status": "pending",
+            "details": verification
+        }
     
     else:
         # Decisive Rejection: If amount is wrong/insufficient outside tolerance
         try:
             tx.status = "failed"
+            tx.status_reason = f"TXID tidak cocok: {verification['message']}"[:250]
             db.commit()
         except Exception:
             db.rollback()

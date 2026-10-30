@@ -116,7 +116,17 @@ class CryptoValidator:
                 receipt = data.get("result")
 
                 if not receipt:
-                    return {"status": "pending", "message": "Transaksi belum ditemukan di blockchain (tunggu 1-2 menit)"}
+                    # Distinguish "exists but not mined yet" from "hash does not exist at all":
+                    # a hash unknown to the node can never become a valid payment.
+                    probe = {"jsonrpc": "2.0", "method": "eth_getTransactionByHash", "params": [tx_hash], "id": 2}
+                    probe_resp = await client.post(rpc_url, json=probe, timeout=12.0)
+                    probe_data = probe_resp.json()
+                    if not probe_data.get("result"):
+                        return {
+                            "status": "failed",
+                            "message": f"TXID tidak ditemukan di jaringan {chain}. Periksa kembali hash transaksi Anda.",
+                        }
+                    return {"status": "pending", "message": "Transaksi ditemukan tetapi belum terkonfirmasi (tunggu 1-2 menit)"}
 
                 return self._process_receipt(receipt, target_amount, chain, symbol)
         except Exception as e:
