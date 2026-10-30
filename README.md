@@ -59,6 +59,25 @@ Buka `http://localhost:8000` untuk API Docs (Swagger) atau dashboard UI.
 > [!CAUTION]
 > Logic `SECRET_KEY` memiliki fallback jika tidak diisi guna mencegah crash, namun akan mencetak peringatan di console. Pastikan `.env` selalu terkonfigurasi dengan benar di server deployment.
 
+## 💳 Pembayaran QRIS (Statis)
+
+Selain crypto, dashboard kini mendukung **QRIS statis**: pembeli memindai QR milik merchant, lalu admin memverifikasi manual. Tidak perlu payment gateway atau biaya transaksi.
+
+Environment variable terkait:
+
+| Variable | Default | Keterangan |
+|---|---|---|
+| `QRIS_IMAGE_URL` | `/assets/img/qrcodes/qris_static.svg` | URL/path gambar QRIS milik Anda. Ganti placeholder `qris_static.svg` dengan file QRIS asli (PNG/SVG), atau arahkan ke URL gambar Anda. |
+| `QRIS_MERCHANT_NAME` | `ShipStream` | Nama merchant yang ditampilkan di modal pembayaran. |
+| `ADMIN_CONFIRM_TOKEN` | _(kosong)_ | Jika diisi, endpoint konfirmasi admin mewajibkan header `X-Admin-Token`. Sangat disarankan diisi di produksi. |
+
+Alur: `POST /v1/billing/topup` dengan `payment_method: "qris"` → user scan & bayar → `POST /v1/billing/submit-qris-proof/{order_id}` → admin konfirmasi:
+
+```bash
+curl -X POST "https://<domain>/v1/billing/admin/confirm-payment/BILL-XXXXXXXX" \
+  -H "X-Admin-Token: <token-anda>"
+```
+
 ## 📁 Struktur Folder
 - `app/`: Logika backend (FastAPI).
     - `routers/`: `auth`, `apikey`, `billing`, `profile`, `logistics`, `telegram_bot`.

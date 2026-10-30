@@ -630,7 +630,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                 dan testing interaktif (Auto-generated):</p>
                             <a id="swagger-link" href="/docs" target="_blank" class="btn btn-primary"
                                 style="display: inline-block; margin-top: 1rem;" data-i18n="btn_swagger">Open Swagger UI
-                                →</a>
+                                â†’</a>
                         </div>
                     </div>
                 </div>
@@ -1035,8 +1035,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 </div>
                 <div class="form-group">
                     <label data-i18n="modal_topup_method">Metode Pembayaran</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div class="glass" style="padding: 1rem; cursor: pointer; border: 2px solid var(--accent);"
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                        <div class="glass" style="padding: 1rem; cursor: pointer; border: 1px solid var(--border-color);"
                             id="pay-midtrans" onclick="selectPayMethod('midtrans')">
                             <div style="font-weight: 600; font-size: 0.9rem;">Midtrans</div>
                             <div style="font-size: 0.7rem; color: var(--text-secondary);">Virtual Account & E-Wallet
@@ -1048,6 +1048,11 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                             <div style="font-weight: 600; font-size: 0.9rem;">Crypto</div>
                             <div style="font-size: 0.7rem; color: var(--text-secondary);"
                                 data-i18n="modal_topup_crypto_hint">Base / Plasma (EVM)</div>
+                        </div>
+                        <div class="glass" style="padding: 1rem; cursor: pointer; border: 2px solid var(--accent);"
+                            id="pay-qris" onclick="selectPayMethod('qris')">
+                            <div style="font-weight: 600; font-size: 0.9rem;">QRIS</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Semua bank & e-wallet</div>
                         </div>
                     </div>
                 </div>
@@ -1168,6 +1173,53 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 <button id="btn-submit-proof" class="btn btn-primary" onclick="submitCryptoProof()"
                     data-i18n="btn_confirm_now">Confirm Payment Now</button>
                 <button class="btn btn-outline" onclick="closeCryptoCheckout()" data-i18n="btn_close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QRIS Checkout Modal -->
+    <div id="qris-checkout-modal" class="auth-container"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2001; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; backdrop-filter: blur(10px);">
+        <div class="auth-card glass" style="max-width: 460px; text-align: center; margin: auto; position: relative;">
+            <button class="modal-close" onclick="closeQrisCheckout()"><i data-lucide="x"></i></button>
+            <h2 style="color: var(--accent); margin-bottom: 0.5rem;">Pembayaran QRIS</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                Scan QR di bawah dengan aplikasi bank / e-wallet, lalu tekan tombol konfirmasi.
+            </p>
+
+            <div class="glass" style="padding: 1rem; background: #ffffff; display: inline-block; border-radius: 0.75rem;">
+                <img id="qris-qr-image" src="" alt="QRIS"
+                    style="width: 220px; height: 220px; object-fit: contain; display: block;">
+            </div>
+
+            <div class="glass" style="padding: 1rem; margin-top: 1.25rem; background: rgba(0,0,0,0.2);">
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">Nominal</div>
+                <div id="qris-amount" style="font-size: 1.5rem; font-weight: 800; color: var(--success);">Rp 0</div>
+                <div id="qris-merchant" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;"></div>
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.5rem; font-family: monospace;">
+                    Order: <span id="qris-order-id">-</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; text-align: left;">
+                <label style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                    Catatan / referensi (opsional)
+                </label>
+                <input type="text" id="qris-note" placeholder="mis. nama pengirim atau ID transaksi bank"
+                    autocomplete="off" maxlength="120"
+                    style="width: 100%; padding: 0.7rem; background: #0b0e14; border: 1px solid var(--border-color); color: white; border-radius: 0.5rem; outline: none; font-size: 0.85rem;">
+            </div>
+
+            <div style="background: rgba(245, 158, 11, 0.1); border-radius: 0.5rem; padding: 0.85rem; margin-top: 1rem; border: 1px solid rgba(245, 158, 11, 0.2); text-align: left;">
+                <p style="font-size: 0.75rem; color: #f59e0b; display: flex; align-items: start; gap: 0.5rem;">
+                    <i data-lucide="info" style="min-width: 16px;"></i>
+                    Kirim <b>tepat</b> sebesar nominal di atas. Kuota ditambahkan setelah admin memverifikasi (maks. 1x24 jam).
+                </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+                <button id="btn-submit-qris" class="btn btn-primary" onclick="submitQrisProof()">Saya Sudah Bayar</button>
+                <button class="btn btn-outline" onclick="closeQrisCheckout()">Tutup</button>
             </div>
         </div>
     </div>
@@ -1398,11 +1450,12 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         let currentUser = null;
         let currentTab = 'keys';
         let isDashboardBusy = false;
+        let activePayMethod = 'qris';
         window._lastExchangeRate = 16000;
         window._intervals = [];
         window._selectedPlaygroundKey = null;
 
-        // Global fetch interceptor — handle session termination (FIX 4)
+        // Global fetch interceptor â€” handle session termination (FIX 4)
         (function () {
             const _originalFetch = window.fetch;
             window.fetch = async function (...args) {
@@ -1435,7 +1488,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             };
         })();
 
-        // Session health check — polling setiap 5 menit (FIX 5)
+        // Session health check â€” polling setiap 5 menit (FIX 5)
         (function startSessionPolling() {
             const POLL_INTERVAL = 5 * 60 * 1000;
             setInterval(async () => {
@@ -1447,7 +1500,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                     });
                     // Jika 401, interceptor di atas akan handle otomatis
                 } catch (_) {
-                    // Network error — abaikan, jangan logout
+                    // Network error â€” abaikan, jangan logout
                 }
             }, POLL_INTERVAL);
         })();
@@ -1589,7 +1642,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             return `Rp ${amountIDR.toLocaleString('id-ID')}`;
         }
 
-        // Global safe date parser — ensures UTC consistency for naive strings from DB
+        // Global safe date parser â€” ensures UTC consistency for naive strings from DB
         function safeParseDate(dateStr) {
             if (!dateStr) return null;
             // If it doesn't have a timezone suffix and is ISO-like, append Z
@@ -1645,7 +1698,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         }
 
         /**
-         * Premium Custom Dropdowns — Portal Pattern
+         * Premium Custom Dropdowns â€” Portal Pattern
          * Renders options panel directly on document.body to bypass
          * backdrop-filter stacking context clipping inside .glass cards.
          */
@@ -1699,7 +1752,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 container.appendChild(trigger);
                 parent.insertBefore(container, select.nextSibling);
 
-                // --- Build Options Panel (Portal → body) ---
+                // --- Build Options Panel (Portal â†’ body) ---
                 const panel = document.createElement('div');
                 panel.className = 'cs-portal-panel';
                 panel.style.cssText = `
@@ -1881,7 +1934,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 session_device: 'Perangkat',
                 session_ip: 'Alamat IP',
                 session_last_active: 'Aktif Terakhir',
-                btn_swagger: 'Buka Swagger UI →',
+                btn_swagger: 'Buka Swagger UI â†’',
                 setup_bot_title: 'Cara Setup Bot:',
                 setup_bot_step1: '1. Buat bot di @BotFather untuk dapat API Token.',
                 setup_bot_step2: '2. Cari ID angka Anda di @userinfobot untuk Chat ID.',
@@ -2144,7 +2197,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 label_req: 'Req',
                 label_order_id_short: 'Order ID',
                 label_order_id: 'ID Order',
-                label_midtrans: '💳 Midtrans (Virtual Account)',
+                label_midtrans: 'ðŸ’³ Midtrans (Virtual Account)',
                 label_expired_status: 'Kadaluarsa',
                 label_sisa_waktu: 'Sisa waktu',
                 session_just_now: 'Baru saja',
@@ -2199,7 +2252,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 session_device: 'Device',
                 session_ip: 'IP Address',
                 session_last_active: 'Last Active',
-                btn_swagger: 'Open Swagger UI →',
+                btn_swagger: 'Open Swagger UI â†’',
                 setup_bot_title: 'Bot Setup Guide:',
                 setup_bot_step1: '1. Create a bot via @BotFather to get your API Token.',
                 setup_bot_step2: '2. Find your numerical ID at @userinfobot for your Chat ID.',
@@ -2318,7 +2371,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 docs_error_403_code: 'Forbidden',
                 docs_error_429_code: 'Too Many Requests',
                 sec_active_sessions: 'Active Login Sessions',
-                modal_cancel_title: '🗑 Cancel Order?',
+                modal_cancel_title: 'ðŸ—‘ Cancel Order?',
                 modal_cancel_info: 'Order Information:',
                 modal_cancel_pkg: 'Package',
                 modal_cancel_method: 'Method',
@@ -2478,7 +2531,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 label_req: 'Req',
                 label_order_id_short: 'Order ID',
                 label_order_id: 'Order ID',
-                label_midtrans: '💳 Midtrans (Virtual Account)',
+                label_midtrans: 'ðŸ’³ Midtrans (Virtual Account)',
                 label_expired_status: 'Expired',
                 label_sisa_waktu: 'Time remaining',
                 session_just_now: 'Just now',
@@ -2884,7 +2937,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                         ${isCurrent ? `<span style="font-size: 0.7rem; background: var(--accent); color: white; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-weight: 400; vertical-align: middle; margin-left: 0.5rem;" data-i18n="session_current">${t('session_current')}</span>` : ''}
                                     </div>
                                     <div style="font-size: 0.75rem; color: var(--text-secondary);">
-                                        IP: ${s.ip_address} • <span data-i18n="session_last_active">${t('session_last_active')}</span>: ${lastActive}
+                                        IP: ${s.ip_address} â€¢ <span data-i18n="session_last_active">${t('session_last_active')}</span>: ${lastActive}
                                     </div>
                                 </div>
                             </div>
@@ -3467,7 +3520,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                                 if (remainMs > 0) {
                                     const mins = Math.floor(remainMs / 60000);
                                     const secs = Math.floor((remainMs % 60000) / 1000);
-                                    reasonHtml = `<div class="tx-countdown" data-expires="${tx.expires_at}" style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;">⏱ ${t('billing_countdown')}: ${mins}m ${secs}s</div>`;
+                                    reasonHtml = `<div class="tx-countdown" data-expires="${tx.expires_at}" style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;">â± ${t('billing_countdown')}: ${mins}m ${secs}s</div>`;
                                 } else {
                                     reasonHtml = `<div style="font-size:0.75rem;color:#94a3b8;margin-top:0.4rem;display:flex;align-items:center;gap:4px;font-style:italic;">
                                          <i data-lucide="hourglass" style="width:12px;height:12px;"></i> ${t('billing_expired')}
@@ -3599,7 +3652,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         }
 
         function showTxStatusInfo(tx) {
-            // PENDING → Re-open checkout to let user submit TXID
+            // PENDING â†’ Re-open checkout to let user submit TXID
             if (tx.status === 'pending') {
                 if (tx.payment_method === 'crypto') {
                     showCryptoCheckout(tx);
@@ -3608,7 +3661,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 }
                 return;
             }
-            // EXPIRED/CANCELLED → also show info modal
+            // EXPIRED/CANCELLED â†’ also show info modal
             showTxInfoModal(tx);
         }
 
@@ -3775,7 +3828,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 [t('label_nominal'), formatAmount(tx.amount || 0)],
                 [t('label_quota'), `<span style="color:#6366f1;font-weight:700">+${(tx.quota_added || 0).toLocaleString()} Requests</span>`],
                 ...(isCrypto && meta.expected_usd ? [[t('label_nominal_crypto'), `${meta.expected_usd} ${meta.symbol || 'USDC'}`]] : []),
-                ...(isCrypto && meta.amount_received ? [[t('label_received'), `${meta.amount_received} ${meta.verified_symbol || meta.symbol || 'USDC'} ✓`]] : []),
+                ...(isCrypto && meta.amount_received ? [[t('label_received'), `${meta.amount_received} ${meta.verified_symbol || meta.symbol || 'USDC'} âœ“`]] : []),
                 ...(tx.tx_hash ? (() => {
                     const explorerBase = (meta.chain || '').toLowerCase().includes('plasma')
                         ? `https://www.plasmascan.to/tx/${tx.tx_hash}`
@@ -3811,6 +3864,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
 
         function showTopupModal(keyId = null) {
+            selectPayMethod(activePayMethod);
             if (currentUser && !currentUser.is_verified) {
                 showToast('billing_locked_verified', 'error');
                 return;
@@ -3860,6 +3914,8 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
 
                     if (activePayMethod === 'crypto') {
                         showCryptoCheckout(tx);
+                    } else if (activePayMethod === 'qris') {
+                        showQrisCheckout(tx);
                     } else {
                         showToast('toast_topup_initiated', 'success');
                         switchTab('billing');
@@ -3874,6 +3930,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
             activePayMethod = method;
             document.getElementById('pay-midtrans').style.borderColor = method === 'midtrans' ? 'var(--accent)' : 'var(--border-color)';
             document.getElementById('pay-crypto').style.borderColor = method === 'crypto' ? 'var(--accent)' : 'var(--border-color)';
+            document.getElementById('pay-qris').style.borderColor = method === 'qris' ? 'var(--accent)' : 'var(--border-color)';
             document.getElementById('crypto-options').style.display = method === 'crypto' ? 'block' : 'none';
         }
 
@@ -3907,7 +3964,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 if (rateRes.ok) {
                     const rateData = await rateRes.json();
                     idrPerUsd = rateData.rate;
-                    document.getElementById('rate-value').innerText = `1 USD ≈ Rp ${idrPerUsd.toLocaleString()}`;
+                    document.getElementById('rate-value').innerText = `1 USD â‰ˆ Rp ${idrPerUsd.toLocaleString()}`;
                 } else {
                     document.getElementById('rate-value').innerText = 'Backend Fallback (Static)';
                 }
@@ -3963,6 +4020,61 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         function closeCryptoCheckout() {
             closeModal('crypto-checkout-modal');
             switchTab('billing');
+        }
+
+        function showQrisCheckout(tx) {
+            const meta = tx.tx_metadata || {};
+            window.activeQrisOrderId = tx.order_id;
+            const img = document.getElementById('qris-qr-image');
+            img.src = meta.qr_image_url || '/assets/img/qrcodes/qris_static.svg';
+            img.onerror = () => {
+                img.onerror = null;
+                img.src = '/assets/img/qrcodes/qris_static.svg';
+            };
+            document.getElementById('qris-amount').innerText = 'Rp ' + Number(tx.amount || 0).toLocaleString('id-ID');
+            document.getElementById('qris-merchant').innerText = meta.merchant || '';
+            document.getElementById('qris-order-id').innerText = tx.order_id;
+            document.getElementById('qris-note').value = '';
+            const btn = document.getElementById('btn-submit-qris');
+            btn.disabled = false;
+            btn.innerText = 'Saya Sudah Bayar';
+            openModal('qris-checkout-modal');
+            lucide.createIcons();
+        }
+
+        function closeQrisCheckout() {
+            closeModal('qris-checkout-modal');
+            switchTab('billing');
+        }
+
+        async function submitQrisProof() {
+            const orderId = window.activeQrisOrderId;
+            if (!orderId) return;
+            const btn = document.getElementById('btn-submit-qris');
+            const note = document.getElementById('qris-note').value.trim();
+            btn.disabled = true;
+            btn.innerText = 'Mengirim...';
+            try {
+                const res = await fetch(`${API_URL}/v1/billing/submit-qris-proof/${orderId}?note=${encodeURIComponent(note)}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok) {
+                    btn.innerText = 'Menunggu verifikasi';
+                    showToast('Pembayaran dikirim. Menunggu verifikasi admin.', 'success');
+                    setTimeout(() => { closeQrisCheckout(); }, 1500);
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = 'Saya Sudah Bayar';
+                    showToast(data.detail || 'Gagal mengirim konfirmasi pembayaran.', 'error');
+                }
+            } catch (err) {
+                console.error('Error submitting QRIS proof:', err);
+                btn.disabled = false;
+                btn.innerText = 'Saya Sudah Bayar';
+                showToast('Terjadi kesalahan jaringan.', 'error');
+            }
         }
 
         async function submitCryptoProof() {
@@ -4024,15 +4136,26 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                 `Apakah Anda (Admin) sudah memverifikasi dana masuk di wallet? Klik Konfirmasi untuk menambah kuota user untuk order ${orderId}.`,
                 async () => {
                     try {
+                        let adminToken = localStorage.getItem('shipstream_admin_token') || '';
+                        if (!adminToken) {
+                            adminToken = (prompt('Masukkan Admin Token:') || '').trim();
+                            if (adminToken) localStorage.setItem('shipstream_admin_token', adminToken);
+                        }
                         const res = await fetch(`${API_URL}/v1/billing/admin/confirm-payment/${orderId}`, {
                             method: 'POST',
-                            headers: { 'Authorization': `Bearer ${token}` }
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'X-Admin-Token': adminToken
+                            }
                         });
 
                         if (res.ok) {
                             showToast('toast_verify_success', 'success');
                             loadBillingHistory();
                             loadKeys();
+                        } else if (res.status === 401) {
+                            localStorage.removeItem('shipstream_admin_token');
+                            showToast('Admin Token salah atau belum diisi.', 'error');
                         } else {
                             showToast('toast_verify_fail', 'error');
                         }
@@ -4447,7 +4570,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
                     document.execCommand('copy');
                     showToast(t('copied') || 'Copied!', 'success');
                 } catch (e) {
-                    showToast('Copy failed — long press to copy', 'error');
+                    showToast('Copy failed â€” long press to copy', 'error');
                 } finally {
                     document.body.removeChild(ta);
                 }
@@ -4766,7 +4889,7 @@ curl -H "X-API-Key: YOUR_API_KEY_HERE" ${window.location.origin}/v1/couriers</pr
         }
 
         // Run Initialization
-        console.log('🔥🔥 DASHBOARD CORE LOADED 🔥🔥');
+        console.log('ðŸ”¥ðŸ”¥ DASHBOARD CORE LOADED ðŸ”¥ðŸ”¥');
         initializeDashboard();
         initDebugMode();
     </script>

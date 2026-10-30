@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="440" viewBox="0 0 440 440" role="img" aria-label="Placeholder QRIS">
+  <rect width="440" height="440" fill="#ffffff"/>
+  <rect x="12" y="12" width="416" height="416" fill="none" stroke="#111827" stroke-width="4" stroke-dasharray="14 10"/>
+  <g fill="#111827" font-family="Segoe UI, Arial, sans-serif" text-anchor="middle">
+    <text x="220" y="180" font-size="26" font-weight="700">GANTI GAMBAR INI</text>
+    <text x="220" y="216" font-size="18">dengan tangkapan layar QRIS milik Anda</text>
+    <text x="220" y="262" font-size="15" fill="#6b7280">simpan sebagai qris_static.png / .svg</text>
+    <text x="220" y="286" font-size="15" fill="#6b7280">atau set env QRIS_IMAGE_URL</text>
+  </g>
+  <g fill="none" stroke="#111827" stroke-width="8">
+    <rect x="52" y="52" width="46" height="46"/>
+    <rect x="342" y="52" width="46" height="46"/>
+    <rect x="52" y="342" width="46" height="46"/>
+  </g>
+</svg>

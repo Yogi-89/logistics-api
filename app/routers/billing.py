@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, Header, HTTPException, status
 import os
 from sqlalchemy.orm import Session
 from typing import List
@@ -113,6 +113,16 @@ async def create_topup(request: schemas.TopupRequest, db: Session = Depends(get_
             "symbol": request.symbol or "USDC",
             "expected_usd": expected_usd,
             "network": "Mainnet"
+        }
+    elif request.payment_method == "qris":
+        # Static QRIS: the merchant QR image is served by the frontend (or an external URL),
+        # the amount is entered by the payer, and the admin confirms the transfer manually.
+        metadata = {
+            "qr_image_url": os.getenv("QRIS_IMAGE_URL", "/assets/img/qrcodes/qris_static.svg"),
+            "merchant": os.getenv("QRIS_MERCHANT_NAME", "ShipStream"),
+            "amount_idr": request.amount,
+            "currency": "IDR",
+            "instructions": "Scan the QRIS code, pay the exact amount, then press 'Saya sudah bayar'.",
         }
 
     db_transaction = models.Transaction(
@@ -262,12 +272,70 @@ async def submit_crypto_proof(order_id: str, tx_hash: str, db: Session = Depends
             "details": verification
         }
 
+@router.post("/submit-qris-proof/{order_id}")
+def submit_qris_proof(
+    order_id: str,
+    note: str = "",
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Step 2 (QRIS): the payer confirms the transfer and may attach a short note/reference.
+    The order moves to 'awaiting_verification' and stays there until an admin confirms it
+    through /admin/confirm-payment.
+    """
+    tx = db.query(models.Transaction).filter(
+        models.Transaction.order_id == order_id,
+        models.Transaction.user_id == current_user.id,
+    ).first()
+    if not tx:
+        raise HTTPException(status_code=404, detail="Transaksi tidak ditemukan.")
+
+    if tx.status == "success":
+        return {"message": "Transaksi ini sudah sukses.", "status": "success"}
+    if tx.status == "expired":
+        raise HTTPException(status_code=400, detail="Order ini sudah kadaluarsa. Silakan buat order baru.")
+    if tx.status == "failed":
+        raise HTTPException(status_code=400, detail="Order ini sudah ditandai gagal. Silakan buat order baru.")
+    if tx.payment_method != "qris":
+        raise HTTPException(status_code=400, detail="Order ini bukan pembayaran QRIS.")
+
+    metadata = dict(tx.tx_metadata or {})
+    metadata["proof_note"] = (note or "").strip()[:500]
+    metadata["proof_submitted_at"] = datetime.utcnow().isoformat()
+
+    try:
+        tx.tx_metadata = metadata
+        tx.status = "awaiting_verification"
+        db.commit()
+        db.refresh(tx)
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Gagal menyimpan konfirmasi pembayaran")
+
+    return {
+        "message": "Terima kasih! Pembayaran Anda menunggu verifikasi admin.",
+        "order_id": tx.order_id,
+        "status": tx.status,
+    }
+
+
 @router.post("/admin/confirm-payment/{order_id}")
-def confirm_payment(order_id: str, db: Session = Depends(get_db)):
+def confirm_payment(
+    order_id: str,
+    db: Session = Depends(get_db),
+    x_admin_token: str = Header(default=None),
+):
     """
     Step 3 (Admin): Admin confirms the payment is valid.
     Only after this, the Quota is added to the API Key.
     """
+    expected_token = os.getenv("ADMIN_CONFIRM_TOKEN")
+    if expected_token and x_admin_token != expected_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Admin token tidak valid. Kirim header X-Admin-Token.",
+        )
     # Find transaction
     tx = db.query(models.Transaction).filter(models.Transaction.order_id == order_id).first()
     if not tx:
@@ -300,3 +368,4 @@ def confirm_payment(order_id: str, db: Session = Depends(get_db)):
         "new_global_limit": user.quota_limit if user else None,
         "status": "success"
     }
+
