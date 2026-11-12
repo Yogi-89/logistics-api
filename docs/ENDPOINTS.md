@@ -1,69 +1,85 @@
-# API Endpoints – Logistics API
+# Endpoint index
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `GET` | `/` | Root — status server & dokumentasi link |
-| `GET` | `/docs` | Swagger UI (FastAPI otomatis) |
-| `GET` | `/redoc` | ReDoc (FastAPI otomatis) |
+Complete, always-current reference: `/docs` (Swagger) or `/redoc` on any running instance.
+This page is a compact map of what exists.
 
----
+Legend: **key** = requires `X-API-Key`, **jwt** = requires `Authorization: Bearer <token>`, — = public.
 
-## Auth
+## Service
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `POST` | `/auth/register` | Registrasi user baru |
-| `POST` | `/auth/login` | Login, mengembalikan JWT token |
-| `POST` | `/auth/verify-otp` | Verifikasi kode OTP email |
-| `POST` | `/auth/resend-otp` | Kirim ulang kode OTP |
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/api/` | — | Health/identity payload |
+| GET | `/` | — | Landing page / dashboard entry |
+| GET | `/docs`, `/redoc`, `/openapi.json` | — | Interactive API reference |
 
----
+## Authentication
 
-## API Key
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/auth/register` | — | Create an account, emits an email OTP |
+| POST | `/auth/verify-code` | — | Activate the account with the OTP |
+| POST | `/auth/login` | captcha header | Exchange credentials for a JWT |
+| POST | `/auth/resend-registration-code` | — | Re-send the OTP (rate limited) |
+| GET | `/auth/debug/otp/{username}` | — | Debug only; disabled when `DEBUG_MODE=false` |
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `POST` | `/apikey/generate` | Generate API Key baru |
-| `GET` | `/apikey/list` | Lihat semua API Key milik user |
-| `PUT` | `/apikey/{key_id}/settings` | Update label, limit, whitelist IP, atau status API Key |
-| `DELETE` | `/apikey/revoke/{key_id}` | Revoke / hapus API Key |
+## API keys
 
----
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/apikey/generate` | jwt | Create a key (label, optional limits/allow-list) |
+| GET | `/apikey/list` | jwt | List keys with usage counters |
+| PUT | `/apikey/{key_id}/settings` | jwt | Update label, limit, IP allow-list |
+| DELETE | `/apikey/revoke/{key_id}` | jwt | Revoke a key |
 
-## Cities
+## Logistics (metered)
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `GET` | `/v1/cities` | Daftar semua kota |
-| `GET` | `/v1/cities/{city_id}` | Detail satu kota |
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/v1/cost` | key | Shipping cost for one courier |
+| POST | `/v1/cost/recommend` | key | Cheapest courier recommendation |
+| GET | `/v1/couriers` | key | Courier catalogue |
+| GET | `/v1/cities` | key | City directory |
+| GET | `/v1/cities/{city_id}/subdistricts` | key | Subdistricts for a city |
+| POST | `/v1/shipments` | key | Create a shipment, returns an AWB |
+| GET | `/v1/tracking/{awb}` | key | Tracking status and history |
+| POST | `/v1/tracking/{awb}/update` | key | Append a tracking event |
+| GET | `/v1/label/{awb}` | key | Printable label (PDF, `?lang=id|en`) |
+| GET | `/v1/quota` | key | Remaining quota for the account |
 
----
+## Billing
 
-## Couriers
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/v1/billing/topup` | jwt | Create an order (`crypto` or `qris`) |
+| GET | `/v1/billing/history` | jwt | Orders, auto-expiring stale ones |
+| DELETE | `/v1/billing/cancel/{order_id}` | jwt | Cancel a pending order |
+| POST | `/v1/billing/submit-proof/{order_id}` | jwt | Submit a crypto TXID for verification |
+| POST | `/v1/billing/submit-qris-proof/{order_id}` | jwt | Declare a QRIS transfer, optional note |
+| POST | `/v1/billing/admin/confirm-payment/{order_id}` | admin token | Approve an order and credit quota |
+| GET | `/v1/billing/qris-config` | — | QRIS image path + merchant label |
+| GET | `/v1/billing/exchange-rate` | — | Current IDR/USD rate |
+| GET | `/v1/billing/contact` | — | Public support contact |
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `GET` | `/v1/couriers` | Daftar semua kurir |
+## Profile
 
----
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/profile/me` | jwt | Current account and quota |
+| POST | `/profile/request-otp` | jwt | OTP for a sensitive change |
+| PUT | `/profile/update-email` | jwt | Change email (OTP protected) |
+| PUT | `/profile/update-phone` | jwt | Change phone number |
+| PUT | `/profile/update-password` | jwt | Rotate the password |
+| PATCH | `/profile/preferences` | jwt | Language, currency, alert threshold, webhook |
+| GET | `/profile/sessions` | jwt | Active sessions |
+| DELETE | `/profile/sessions/{session_id}` | jwt | Revoke a session |
+| POST | `/profile/test-webhook` | jwt | Send a test event to the configured webhook |
 
-## Shipments
+## Integrations
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `POST` | `/v1/shipments` | Buat shipment baru (mengembalikan AWB) |
-| `GET` | `/v1/label/{awb}` | Generate shipping label PDF berdasarkan AWB |
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/telegram/webhook/{bot_token}` | bot token | Telegram update receiver |
 
----
-
-## Tracking
-
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `GET` | `/v1/tracking/{awb}` | Lacak status pengiriman |
-| `PUT` | `/v1/tracking/{awb}/update` | Update status tracking (Auth required) |
-
----
-
-> **Base URL:** `http://localhost:8000`  
-> **Autentikasi:** JWT Bearer token (dari `/auth/login`) atau `X-API-Key` header
+All metered endpoints return `401` for a missing/invalid key and a quota error when the account is
+exhausted; failures never consume a unit of quota.
