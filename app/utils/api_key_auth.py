@@ -79,7 +79,7 @@ def check_quota_alert(user: models.User, db: Session):
     if threshold > 0 and remaining <= threshold:
         last_alert = prefs.get("last_alert_at")
         # Simple cooldown: Once per 24h OR if top-up happened (reset by checking if last_alert_quota < remaining)
-        # For simplicity in EAS: if not alerted for this specific session/threshold state
+        # Notify at most once per threshold state; a top-up resets last_alert_quota
         last_alert_quota = prefs.get("last_alert_quota", 0)
         
         if not last_alert or last_alert_quota < remaining:

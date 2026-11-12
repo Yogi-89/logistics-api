@@ -25,7 +25,7 @@ def seed_reference_data_if_empty() -> None:
 
 
 def seed_rajaongkir_ids_if_missing() -> None:
-    from seed_rajaongkir_ids import seed
+    from scripts.seed_rajaongkir_ids import seed
 
     seed()
 

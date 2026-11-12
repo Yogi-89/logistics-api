@@ -74,7 +74,7 @@ def verify_code(req: schemas.VerificationCode, db: Session = Depends(get_db)):
     try:
         db_code.is_used = True
         db.commit()
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal memperbarui status verifikasi")
     
@@ -123,7 +123,7 @@ async def login(request: Request, login_data: LoginJSON, db: Session = Depends(g
     try:
         db.add(new_session)
         db.commit()
-    except Exception as e:
+    except Exception:
         db.rollback()
         # Non-critical: Login tetap berhasil meskipun session tracking gagal
         pass
@@ -170,7 +170,7 @@ async def resend_registration_code(req: schemas.ResendCodeRequest, db: Session =
         user.resend_count += 1
         user.last_resend_at = now
         db.commit()
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal memperbarui data resend")
     

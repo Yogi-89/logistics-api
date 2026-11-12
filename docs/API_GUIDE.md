@@ -2,9 +2,9 @@
 
 Dokumentasi lengkap endpoint API, contoh request/response, dan panduan integrasi.
 
-- **Author:** Yogi Prasetyo (22081010297)
+- **Author:** Yogi Prasetyo
 - **Base URL (local):** `http://localhost:8000`
-- **Base URL (production):** disesuaikan dengan deployment
+- **Base URL (production):** `https://apilogistik.my.id`
 - **Swagger Docs:** `<base_url>/docs`
 - **Redoc:** `<base_url>/redoc`
 
@@ -34,10 +34,11 @@ GET /api/
 **Response:**
 ```json
 {
-  "message": "Welcome to Logistics API",
-  "author": "Yogi Prasetyo",
-  "nim": "22081010297",
-  "docs": "/docs"
+  "service": "ShipStream Logistics API",
+  "version": "1.0.0",
+  "docs": "/docs",
+  "openapi": "/openapi.json",
+  "health": "ok"
 }
 ```
 
@@ -961,4 +962,5 @@ API mendukung integrasi **real-time** dengan RajaOngkir via environment variable
 
 ---
 
-_Dokumentasi ini dibuat untuk keperluan EAS Semester 6 — Mata Kuliah Pemograman API._
+_Dokumentasi ini adalah bagian dari ShipStream — lihat [ABSTRACT.md](ABSTRACT.md) untuk ringkasan produk
+dan [ARCHITECTURE.md](ARCHITECTURE.md) untuk detail arsitektur._

@@ -13,9 +13,12 @@ from slowapi import _rate_limit_exceeded_handler
 # To update DB, run: alembic upgrade head
 
 app = FastAPI(
-    title="Logistics Rate & Tracking API",
-    description="API for checking shipping rates and tracking packages (EAS Semester 8)",
-    version="1.0.0"
+    title="ShipStream Logistics API",
+    description=(
+        "Unified logistics API: shipping-cost quotes, courier directory, shipment "
+        "creation and real-time tracking behind a single API key."
+    ),
+    version="1.0.0",
 )
 
 # Rate Limiter Configuration
@@ -60,10 +63,11 @@ if frontend_path.exists():
 @app.get("/api/")
 def api_root():
     return {
-        "message": "Welcome to Logistics API",
-        "author": "Yogi Prasetyo",
-        "nim": "22081010297",
-        "docs": "/docs"
+        "service": "ShipStream Logistics API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "openapi": "/openapi.json",
+        "health": "ok",
     }
 
 @app.get("/")

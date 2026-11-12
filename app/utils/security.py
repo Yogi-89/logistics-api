@@ -12,9 +12,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
-    # Untuk keperluan EAS, kita berikan fallback namun dengan peringatan di log console
+    # Local development fallback so the app can boot without a configured secret.
     print("WARNING: SECRET_KEY not found in .env. Using insecure default. Please configure local .env!")
-    SECRET_KEY = "yogi_prasetyo_uts_insecure_fallback"
+    SECRET_KEY = "dev_only_insecure_fallback_change_me"
 
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_int_env("ACCESS_TOKEN_EXPIRE_MINUTES", 1440)

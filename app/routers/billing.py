@@ -153,7 +153,7 @@ async def create_topup(request: schemas.TopupRequest, db: Session = Depends(get_
         db.add(db_transaction)
         db.commit()
         db.refresh(db_transaction)
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal membuat pesanan topup")
     return db_transaction

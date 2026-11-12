@@ -1,93 +1,222 @@
-# ShipStream — Logistics Rate & Tracking API
+# ShipStream — Logistics API Platform
 
-Sistem API Logistik sederhana untuk cek tarif dan tracking paket sebagai syarat EAS Pemrograman API.
+**One integration for shipping rates, courier data and parcel tracking — metered per API key.**
 
-## 🌟 Fitur Utama (Advanced Version)
-- **Global Quota Pool**: Sistem prepaid terpusat. Kuota digunakan bersama oleh semua API Key dalam satu akun.
-- **Crypto Payment Automation**: Verifikasi pembayaran otomatis menggunakan **BaseScan API** (Ethereum/Base network).
-- **Advanced API Dashboard**: Monitoring penggunaan kuota global dan manajemen API Key real-time.
-- **Security**: OTP Verification via **Resend.com**, 3x/24h Daily Limits, and Exponential Backoff for premium protection.
+ShipStream is a production-shaped logistics API platform: developers sign up, generate an API key,
+call a single set of endpoints for rates/tracking/labels, and pay for usage with prepaid quota
+(QRIS or USDC on Base). It ships with a self-service dashboard, automated on-chain payment
+verification and a documented REST surface.
 
-## 🚀 Instalasi & Setup
+[![Live](https://img.shields.io/badge/live-apilogistik.my.id-4f46e5?style=flat-square)](https://apilogistik.my.id)
+[![API Docs](https://img.shields.io/badge/docs-Swagger-85ea2d?style=flat-square)](https://apilogistik.my.id/docs)
+[![Python](https://img.shields.io/badge/python-3.12-3776ab?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.137-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169e1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/license-MIT-black?style=flat-square)](LICENSE)
 
-### 1. Persiapan Database
-Pastikan PostgreSQL lokal Anda sudah berjalan. Buat database baru bernama `logistics_api`.
+---
 
-### 2. Environment Variables
-Buat file `.env` di root folder dengan konfigurasi berikut:
+## Why it exists
+
+Adding shipping to an application normally means integrating several courier APIs, each with its own
+auth scheme, error format and pricing. ShipStream exposes one contract instead:
+
+```
+your app ──► ShipStream API ──► courier / rate providers
+                  │
+                  └─ API key, quota, rate limits, audit trail
+```
+
+Every key belongs to a user account with a shared prepaid quota pool, so a team can issue several
+keys without juggling separate subscriptions.
+
+## Features
+
+**Developer API**
+- Shipping-cost quotes across couriers, plus a cheapest-courier recommendation endpoint
+- City / subdistrict directory and courier catalogue
+- Shipment creation with generated AWB (waybill)
+- Real-time tracking history and status updates
+- Printable shipping label (PDF)
+- Per-key quota endpoint and OpenAPI/Swagger schema
+
+**Accounts & access**
+- Email + OTP registration, JWT sessions, argon2 password hashing
+- Multiple API keys per account with revoke and per-key settings
+- Shared prepaid quota pool, request counting, IP allow-listing
+- Rate limiting with exponential backoff on repeated failures
+
+**Billing**
+- Prepaid top-up packages, order lifecycle (`pending → awaiting_verification → success`)
+- **Static QRIS**: payer scans the merchant QR, confirms, admin approves with a shared token
+- **USDC on Base**: automatic verification against the chain via Etherscan v2 + RPC fallback
+
+**Operations**
+- Alembic migrations executed on boot, idempotent reference-data seeding
+- Health endpoint, structured startup logs, GitHub Actions lint + tests
+- Stateless app tier (safe to scale) against a managed PostgreSQL database
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client
+        B[Browser dashboard<br/>vanilla HTML/CSS/JS]
+        D[Developer app]
+    end
+
+    subgraph Render
+        A[FastAPI app<br/>uvicorn]
+        L[(Rate limiter)]
+    end
+
+    subgraph Managed
+        P[(PostgreSQL<br/>Supabase)]
+        R[Resend<br/>transactional email]
+        E[Etherscan v2 + Base RPC]
+        Q[Static QRIS<br/>merchant code]
+    end
+
+    B -->|JWT| A
+    D -->|X-API-Key| A
+    A --- L
+    A --> P
+    A --> R
+    A --> E
+    A -.->|shows QR| Q
+```
+
+Request flow for a metered API call:
+
+1. `X-API-Key` is resolved to its owner; inactive/revoked keys are rejected.
+2. The shared quota pool is checked and the request counter incremented.
+3. The courier/rate provider is called (with a local dataset fallback when no provider key is set).
+4. The response is returned and the call is recorded for analytics.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the data model, module map and payment state machines.
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| API | FastAPI, Pydantic v2, Uvicorn |
+| Data | PostgreSQL 17, SQLAlchemy 2, Alembic |
+| Auth | JWT (python-jose), argon2 (passlib), OTP via Resend |
+| Payments | Etherscan v2 / Base RPC, static QRIS + admin approval |
+| Frontend | Server-served vanilla HTML/CSS/JS dashboard (no build step) |
+| Infra | Render (Singapore), Supabase Postgres, Cloudflare DNS, GitHub Actions |
+
+## Quick start
+
+```bash
+git clone https://github.com/Yogi-89/logistics-api.git
+cd logistics-api
+
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+source .venv/bin/activate
+pip install -r requirements.txt
+
+cp .env.example .env          # then fill DATABASE_URL + SECRET_KEY
+alembic upgrade head          # create the schema
+python -m app.utils.seed_data # optional reference data (cities, couriers)
+python start.py               # http://localhost:8000
+```
+
+Open <http://localhost:8000> for the dashboard, `/docs` for Swagger, `/redoc` for ReDoc.
+
+Minimal environment for a first run:
+
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/logistics_api
-SECRET_KEY=isi_dengan_string_acak_panjang
-ALGORITHM=HS256
-BASESCAN_API_KEY=your_basescan_api_key
-MY_CRYPTO_WALLET=your_wallet_address
-USDC_CONTRACT_BASE=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913
-USD_PRICE_IDR=17000
-RESEND_API_KEY=re_your_api_key
+DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/logistics_api
+SECRET_KEY=dev-only-change-me
 DEBUG_MODE=True
 ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
+Everything else (email, crypto, QRIS, courier provider) is optional and degrades gracefully.
 
-### 4. Database Schema Sync (Wajib)
-Jalankan script ini untuk menyinkronkan tabel PostgreSQL dengan model Global Quota terbaru:
-```bash
-python -m app.utils.sync_schema
-```
+## API at a glance
 
-### 5. Seed Data (Opsional)
-Jalankan script berikut untuk mengisi data dummy (kota/kurir/tracking):
-```bash
-python -m app.utils.seed_data
-```
-
-### 6. Jalankan Aplikasi
-```bash
-uvicorn app.main:app --reload
-```
-Buka `http://localhost:8000` untuk API Docs (Swagger) atau dashboard UI.
-
-## 🔒 Catatan Keamanan (Review Internal)
-
-> [!WARNING]
-> Proyek ini saat ini menggunakan `allow_origins=["*"]` pada middleware CORS di `main.py`. Pengaturan ini hanya ditujukan untuk **lingkungan pengembangan/testing (Dev Mode)** agar mempermudah testing dari berbagai port.
-> **PADA PRODUKSI**: Harus diganti dengan daftar domain yang spesifik.
-
-> [!CAUTION]
-> Logic `SECRET_KEY` memiliki fallback jika tidak diisi guna mencegah crash, namun akan mencetak peringatan di console. Pastikan `.env` selalu terkonfigurasi dengan benar di server deployment.
-
-## 💳 Pembayaran QRIS (Statis)
-
-Selain crypto, dashboard kini mendukung **QRIS statis**: pembeli memindai QR milik merchant, lalu admin memverifikasi manual. Tidak perlu payment gateway atau biaya transaksi.
-
-Environment variable terkait:
-
-| Variable | Default | Keterangan |
-|---|---|---|
-| `QRIS_IMAGE_URL` | `/assets/img/qrcodes/qris_static.svg` | URL/path gambar QRIS milik Anda. Ganti placeholder `qris_static.svg` dengan file QRIS asli (PNG/SVG), atau arahkan ke URL gambar Anda. |
-| `QRIS_MERCHANT_NAME` | `ShipStream` | Nama merchant yang ditampilkan di modal pembayaran. |
-| `ADMIN_CONFIRM_TOKEN` | _(kosong)_ | Jika diisi, endpoint konfirmasi admin mewajibkan header `X-Admin-Token`. Sangat disarankan diisi di produksi. |
-
-Alur: `POST /v1/billing/topup` dengan `payment_method: "qris"` → user scan & bayar → `POST /v1/billing/submit-qris-proof/{order_id}` → admin konfirmasi:
+Authentication is a header on every metered call:
 
 ```bash
-curl -X POST "https://<domain>/v1/billing/admin/confirm-payment/BILL-XXXXXXXX" \
-  -H "X-Admin-Token: <token-anda>"
+curl https://apilogistik.my.id/v1/cost \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"origin": 1, "destination": 2, "weight": 1000, "courier": "jne"}'
 ```
 
-## 📁 Struktur Folder
-- `app/`: Logika backend (FastAPI).
-    - `routers/`: `auth`, `apikey`, `billing`, `profile`, `logistics`, `telegram_bot`.
-    - `utils/`: `crypto_validator`, `exchange_rate`, `security_utils`, `sync_schema`, `migrate_db`.
-- `frontend/`: UI Dashboard (HTML/CSS/JS).
-- `postman/`: Koleksi testing API Postman.
-- `backups/`: SQL backup snapshot berkala.
-- `docs/`: Dokumentasi pendukung.
+| Group | Endpoints |
+|---|---|
+| Auth | `POST /auth/register`, `/auth/verify-code`, `/auth/login`, `/auth/resend-registration-code` |
+| API keys | `POST /apikey/generate`, `GET /apikey/list`, `POST /apikey/{id}/settings`, `POST /apikey/revoke/{id}` |
+| Logistics | `POST /v1/cost`, `/v1/cost/recommend`, `/v1/shipments`, `GET /v1/cities`, `/v1/couriers`, `/v1/cities/{id}/subdistricts`, `/v1/tracking/{awb}`, `/v1/label/{awb}` |
+| Account | `GET /profile/me`, `POST /profile/request-otp`, `/profile/update-email`, `GET /v1/quota` |
+| Billing | `POST /v1/billing/topup`, `GET /v1/billing/history`, `POST /v1/billing/submit-proof/{order}`, `POST /v1/billing/submit-qris-proof/{order}`, `POST /v1/billing/admin/confirm-payment/{order}` |
 
----
-**Dibuat Oleh**: Yogi Prasetyo (22081010297)
-**Mata Kuliah**: Pemrograman API
-**Dosen**: Muhammad Muharrom Al Haromainy, S.Kom., M.Kom.
+Full reference: [docs/API_GUIDE.md](docs/API_GUIDE.md) and [docs/ENDPOINTS.md](docs/ENDPOINTS.md).
+
+## Payments
+
+**QRIS (static).** The dashboard renders the merchant QR, the payer transfers the exact amount and
+confirms, and an admin approves the order with `X-Admin-Token`. No gateway, no per-transaction fee.
+
+**USDC on Base.** The transaction hash is verified against the chain: the receipt status, the transfer
+log to the merchant wallet, the token contract and the expected amount (with tolerance) must all
+match. Unknown hashes are rejected instead of being left pending.
+
+Environment variables and the admin confirmation flow are documented in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Project structure
+
+```
+app/
+  main.py              FastAPI app, routers, static dashboard mount
+  database.py          engine/session factory
+  models/              SQLAlchemy models
+  routers/             auth, apikey, logistics, billing, profile, telegram_bot
+  schemas/             Pydantic request/response models
+  utils/               security, OTP, crypto validator, rate limiting, seeding
+alembic/               migration environment and versions
+frontend/              dashboard, landing page, assets (no build step)
+scripts/               operational helpers (seed, verify, audit)
+tests/                 pytest suite
+docs/                  abstract, architecture, API guide, deployment runbook
+start.py               boot: migrations → seed → uvicorn
+render.yaml            infrastructure-as-code for the Render service
+```
+
+## Testing
+
+```bash
+pytest tests/ -v
+flake8 app/ --config=.flake8
+```
+
+CI runs both on every push to `develop`/`main`/`staging`.
+
+## Documentation
+
+| Document | Contents |
+|---|---|
+| [docs/ABSTRACT.md](docs/ABSTRACT.md) | Project abstract / executive summary (EN + ID) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module map, data model, request and payment flows |
+| [docs/API_GUIDE.md](docs/API_GUIDE.md) | Step-by-step API usage with examples |
+| [docs/ENDPOINTS.md](docs/ENDPOINTS.md) | Endpoint index |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Render + Supabase + Resend + Cloudflare runbook |
+
+## Roadmap
+
+- [ ] Webhook subscriptions for tracking status changes
+- [ ] Redis-backed quota counters for horizontal scaling
+- [ ] Usage analytics charts in the dashboard
+- [ ] Sandbox keys with synthetic tracking data
+- [ ] OpenAPI-generated SDKs (TypeScript, Python)
+
+## License
+
+Released under the [MIT License](LICENSE).
+
+## Author
+
+**Yogi Prasetyo** — [github.com/Yogi-89](https://github.com/Yogi-89)

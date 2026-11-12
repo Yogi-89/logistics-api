@@ -27,7 +27,7 @@ def generate_key(key_data: schemas.APIKeyCreate, current_user: models.User = Dep
         db.add(new_key)
         db.commit()
         db.refresh(new_key)
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal generate API Key")
     return new_key
@@ -53,7 +53,7 @@ def update_key_settings(key_id: int, settings: schemas.APIKeyUpdate, current_use
     try:
         db.commit()
         db.refresh(key)
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal memperbarui pengaturan API Key")
     return key
@@ -73,7 +73,7 @@ def revoke_key(key_id: int, current_user: models.User = Depends(get_current_user
         db.query(models.Transaction).filter(models.Transaction.api_key_id == key_id).update({models.Transaction.api_key_id: None})
         db.delete(key)
         db.commit()
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Gagal menghapus API Key")
     return {"message": "API Key revoked successfully"}

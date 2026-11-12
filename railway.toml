@@ -1,7 +1,0 @@
-[build]
-builder = "NIXPACKS"
-
-[deploy]
-startCommand = "python railway_start.py"
-healthcheckPath = "/api/"
-healthcheckTimeout = 30

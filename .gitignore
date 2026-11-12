@@ -7,10 +7,26 @@ venv/
 ENV/
 env/
 .env
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
 
 # Database
 *.db
 *.sqlite3
+
+# Local reports and ad-hoc dumps
+/output/
+/screenshots/
+/evidence/
+/bukti_pengujian/
+*.docx
+*.pdf
+*.zip
 
 # IDE
 .vscode/

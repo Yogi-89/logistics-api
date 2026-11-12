@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: logistics-api
+    runtime: python
+    plan: free
+    region: singapore
+    branch: develop
+    buildCommand: pip install -r requirements.txt
+    startCommand: python start.py
+    healthCheckPath: /api/
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DEBUG_MODE
+        value: "False"
+      - key: REDIS_URL
+        value: memory://
+      - key: USD_PRICE_IDR
+        value: "17000"
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: ETHERSCAN_API_KEY
+        sync: false
+      - key: MY_CRYPTO_WALLET
+        sync: false
+      - key: RAJA_ONGKIR_API_KEY
+        sync: false
+      - key: QRIS_IMAGE_URL
+        value: /assets/img/qrcodes/QRIS_MerchantGopay.jpeg
+      - key: QRIS_MERCHANT_NAME
+        sync: false
+      - key: ADMIN_CONFIRM_TOKEN
+        sync: false

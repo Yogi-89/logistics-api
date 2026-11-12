@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "82e4212d-90f9-4601-aaf5-3bb372eb22f7",
-		"name": "Logistics Rate & Tracking API (EAS)",
-		"description": "Collection for testing Logistics API endpoints for EAS Pemrograman API.",
+		"name": "ShipStream Logistics API",
+		"description": "End-to-end collection: register, verify, create an API key and call the metered logistics endpoints.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

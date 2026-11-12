@@ -296,11 +296,11 @@ def test_shipment_special_chars_in_names():
 # BUG 11: Deployment config files
 # ===========================================================================
 
-def test_railway_config_exists():
+def test_deployment_config_exists():
     import os
     base = os.path.dirname(os.path.dirname(__file__))
-    assert os.path.exists(os.path.join(base, "railway.toml"))
-    assert os.path.exists(os.path.join(base, "Procfile"))
+    assert os.path.exists(os.path.join(base, "render.yaml"))
+    assert os.path.exists(os.path.join(base, "start.py"))
 
 
 # ===========================================================================
