@@ -35,10 +35,12 @@ keys without juggling separate subscriptions.
 **Developer API**
 - Shipping-cost quotes across couriers, plus a cheapest-courier recommendation endpoint
 - City / subdistrict directory and courier catalogue
-- Shipment creation with generated AWB (waybill)
+- Shipment creation with generated AWB (waybill), single or **batch up to 100**
 - Real-time tracking history and status updates
 - Printable shipping label (PDF)
 - Per-key quota endpoint and OpenAPI/Swagger schema
+- **Optional payload encryption**: `RSA-AES` and `ECC-AES` (hybrid AES-256-GCM) with public-key
+  discovery, for clients that cannot trust TLS termination points
 
 **Accounts & access**
 - Email + OTP registration, JWT sessions, argon2 password hashing
@@ -201,6 +203,7 @@ CI runs both on every push to `develop`/`main`/`staging`.
 |---|---|
 | [docs/ABSTRACT.md](docs/ABSTRACT.md) | Project abstract / executive summary (EN + ID) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module map, data model, request and payment flows |
+| [docs/ENCRYPTION.md](docs/ENCRYPTION.md) | Hybrid payload encryption contract (RSA-AES / ECC-AES) |
 | [docs/API_GUIDE.md](docs/API_GUIDE.md) | Step-by-step API usage with examples |
 | [docs/ENDPOINTS.md](docs/ENDPOINTS.md) | Endpoint index |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Render + Supabase + Resend + Cloudflare runbook |

@@ -37,3 +37,7 @@ htmlcov/
 # System
 .DS_Store
 Thumbs.db
+
+# Generated server key pairs (never commit private keys)
+/keys/
+*.pem

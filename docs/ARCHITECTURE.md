@@ -163,7 +163,6 @@ erDiagram
 (wallet/chain/expected amount for crypto, image path/merchant for QRIS) without schema churn.
 
 ## 7. Security controls
-
 | Control | Implementation |
 |---|---|
 | Password storage | argon2 via passlib |
@@ -194,3 +193,38 @@ erDiagram
 - **Additional payment providers**: `payment_method` is a free-form string; a new branch in
   `create_topup` plus a verifier is enough to add one.
 - **Additional couriers**: add rows to `couriers` and map provider codes in `logistics.py`.
+
+## 10. Application-layer payload encryption
+
+Besides TLS, three write endpoints accept hybrid-encrypted bodies:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant M as EncryptedBodyMiddleware
+    participant R as Route + Pydantic
+    participant K as hybrid_crypto
+
+    C->>M: POST /v1/shipments<br/>X-Encryption-Scheme: RSA-AES|ECC-AES
+    M->>M: read raw body
+    M->>K: decrypt_payload(scheme, body)
+    K-->>M: plaintext JSON + timing
+    M->>R: replayed body (+ content-length fixed)
+    R-->>C: 200 + X-Server-Decrypt-Ms, X-Decrypted-Bytes
+```
+
+Why middleware instead of a dependency: the body must be plaintext *before* FastAPI runs Pydantic
+validation, so decrypting at the ASGI layer keeps the OpenAPI schema, request models and existing
+validators (`sender_phone`, `postal_code`) exactly as they are.
+
+- Key material comes from `RSA_PRIVATE_KEY_PEM` / `ECC_PRIVATE_KEY_PEM`, else `KEYS_DIR`
+  (default `<repo>/keys`), and is generated on first use when absent.
+- `RSA-AES` wraps a random AES-256 key with RSA-OAEP/SHA-256; `ECC-AES` performs ECDH on P-256 and
+  derives the AES key with HKDF-SHA256 (`info="shipstream-ecc-aes-v1"`).
+- Requests without the header (or with `NONE`) are forwarded untouched, preserving the plaintext
+  baseline used by the frontend and existing tests.
+- Any wrapper, key or GCM-tag failure short-circuits with `400`
+  `Payload decryption or integrity check failed` before the route executes.
+
+Full client contract and examples: [ENCRYPTION.md](ENCRYPTION.md).
+

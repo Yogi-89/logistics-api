@@ -42,6 +42,7 @@ Legend: **key** = requires `X-API-Key`, **jwt** = requires `Authorization: Beare
 | GET | `/v1/cities` | key | City directory |
 | GET | `/v1/cities/{city_id}/subdistricts` | key | Subdistricts for a city |
 | POST | `/v1/shipments` | key | Create a shipment, returns an AWB |
+| POST | `/v1/shipments/batch` | key | Create up to 100 shipments in one call |
 | GET | `/v1/tracking/{awb}` | key | Tracking status and history |
 | POST | `/v1/tracking/{awb}/update` | key | Append a tracking event |
 | GET | `/v1/label/{awb}` | key | Printable label (PDF, `?lang=id|en`) |
@@ -74,6 +75,15 @@ Legend: **key** = requires `X-API-Key`, **jwt** = requires `Authorization: Beare
 | GET | `/profile/sessions` | jwt | Active sessions |
 | DELETE | `/profile/sessions/{session_id}` | jwt | Revoke a session |
 | POST | `/profile/test-webhook` | jwt | Send a test event to the configured webhook |
+
+## Security / encryption
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/v1/security/public-keys` | key | RSA + ECC public keys and the supported schemes |
+
+`POST /v1/cost`, `/v1/shipments` and `/v1/shipments/batch` accept an optional
+`X-Encryption-Scheme: RSA-AES | ECC-AES` header; see [ENCRYPTION.md](ENCRYPTION.md).
 
 ## Integrations
 

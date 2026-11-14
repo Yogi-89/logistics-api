@@ -4,7 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from app.database import engine, Base
-from app.routers import auth, apikey, logistics, billing, profile, telegram_bot
+from app.middleware.encrypted_body import EncryptedBodyMiddleware
+from app.routers import auth, apikey, logistics, billing, profile, security, telegram_bot
 from app.utils.limiter import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -24,6 +25,17 @@ app = FastAPI(
 # Rate Limiter Configuration
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Application-layer payload decryption (opt-in via the X-Encryption-Scheme header).
+# Registered before CORS so that CORS ends up outermost and applies to 400 responses too.
+app.add_middleware(
+    EncryptedBodyMiddleware,
+    protected_paths={
+        "/v1/cost",
+        "/v1/shipments",
+        "/v1/shipments/batch",
+    },
+)
 
 # CORS Configuration
 import os
@@ -48,6 +60,7 @@ async def global_exception_handler(request, exc):
 app.include_router(auth.router)
 app.include_router(apikey.router)
 app.include_router(logistics.router)
+app.include_router(security.router)
 app.include_router(billing.router)
 app.include_router(profile.router)
 app.include_router(telegram_bot.router, prefix="/api/v1")

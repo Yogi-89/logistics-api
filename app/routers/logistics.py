@@ -19,6 +19,55 @@ import asyncio
 
 router = APIRouter(prefix="/v1", tags=["Logistics Data (Needs API Key)"])
 
+# Couriers whose rates are quoted per kilogram internationally. They are valid `courier`
+# values for /v1/cost even when the row is missing from the database, and they never hit the
+# domestic RajaOngkir endpoint.
+INTERNATIONAL_COURIER_CODES = frozenset({"dhl", "fedex", "ups", "maersk", "tnt", "aramex"})
+INTERNATIONAL_BASE_PRICE_IDR = 145000   # fallback estimate per kg
+DOMESTIC_BASE_PRICE_IDR = 12000
+
+
+class _EphemeralCourier:
+    """Lightweight stand-in for a courier code that has not been seeded yet."""
+
+    def __init__(self, code: str):
+        self.code = code.lower()
+        self.name = code.upper()
+        self.id = None
+
+
+def _is_international(code: str) -> bool:
+    return (code or "").lower() in INTERNATIONAL_COURIER_CODES
+
+
+def _fallback_services(courier, weight_kg: float):
+    """Deterministic internal pricing used when the provider is unavailable."""
+    if _is_international(courier.code):
+        base = INTERNATIONAL_BASE_PRICE_IDR
+        return [
+            {
+                "service": "INTL-EXP",
+                "description": "International Express (estimate)",
+                "cost": int(base * weight_kg) or base,
+                "etd": "3-5 Days",
+                "source": "internal_fallback",
+            },
+            {
+                "service": "INTL-ECON",
+                "description": "International Economy (estimate)",
+                "cost": int(base * 0.72 * weight_kg) or int(base * 0.72),
+                "etd": "7-10 Days",
+                "source": "internal_fallback",
+            },
+        ]
+
+    base_price = DOMESTIC_BASE_PRICE_IDR + (len(courier.name) * 100)
+    return [
+        {"service": "REG", "description": "Reguler Service", "cost": int(base_price * weight_kg), "etd": "2-3 Days", "source": "internal_fallback"},
+        {"service": "EXP", "description": "Express Service", "cost": int(base_price * 1.5 * weight_kg), "etd": "1 Day", "source": "internal_fallback"},
+    ]
+
+
 @router.post("/cost/recommend", response_model=List[schemas.CourierCostRecommendation], summary="Rekomendasi Kurir Termurah")
 @limiter.limit("20/minute")
 async def calculate_recommendations(
@@ -40,12 +89,15 @@ async def calculate_recommendations(
     if not origin_city or not destination_city:
         raise HTTPException(status_code=404, detail="Origin or Destination city not found")
 
-    if not origin_city.rajaongkir_id or not destination_city.rajaongkir_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Raja Ongkir ID belum tersedia. Jalankan seed_rajaongkir_ids.py"
-        )
-    
+    # Cities without a RajaOngkir mapping simply fall back to internal estimates instead of
+    # failing the whole recommendation request.
+    provider_ready = (
+        bool(rajaongkir_key)
+        and rajaongkir_key != "your_raja_ongkir_key_here"
+        and bool(origin_city.rajaongkir_id)
+        and bool(destination_city.rajaongkir_id)
+    )
+
     # Calculate effective weight (volumetric)
     volumetric_weight = 0
     if payload.length and payload.width and payload.height:
@@ -54,7 +106,7 @@ async def calculate_recommendations(
 
     async def get_single_courier_cost(courier):
         results = []
-        if rajaongkir_key and rajaongkir_key != "your_raja_ongkir_key_here":
+        if provider_ready and not _is_international(courier.code):
             try:
                 async with httpx.AsyncClient() as client:
                     resp = await client.post(
@@ -85,19 +137,19 @@ async def calculate_recommendations(
                 pass
         
         if not results:
-            # Internal Fallback
+            # Internal fallback, international-aware so new forwarders get sane estimates.
             weight_kg = effective_weight / 1000
-            # Base price per courier could be different, but for now we use a slightly varied formula
-            base_price = 12000 + (len(courier.name) * 500) 
+            services = _fallback_services(courier, weight_kg)
             results = [
                 {
                     "courier_name": courier.name,
                     "courier_code": courier.code,
-                    "service": "REG",
-                    "cost": int(base_price * weight_kg),
-                    "etd": "2-3 Days",
-                    "source": "internal_fallback"
+                    "service": service["service"],
+                    "cost": service["cost"],
+                    "etd": service["etd"],
+                    "source": service["source"],
                 }
+                for service in services
             ]
         return results
 
@@ -145,30 +197,35 @@ async def calculate_cost(
     if not origin or not destination:
         raise HTTPException(status_code=404, detail="Origin or Destination city not found")
 
-    # Validasi rajaongkir_id tersedia
-    if not origin.rajaongkir_id or not destination.rajaongkir_id:
-        missing_city = origin.name if not origin.rajaongkir_id else destination.name
-        raise HTTPException(
-            status_code=400,
-            detail=f"Raja Ongkir ID belum tersedia untuk kota {missing_city}. Jalankan seed_rajaongkir_ids.py"
-        )
-
     courier = db.query(models.Courier).filter(models.Courier.code == payload.courier).first()
     if not courier:
-        raise HTTPException(status_code=404, detail="Courier not found")
-    
+        # Unknown/not-yet-seeded code (e.g. a new international forwarder) still gets a quote
+        # instead of a 404, so adding carriers does not break existing clients.
+        courier = _EphemeralCourier(payload.courier)
+
     # Volumetric Logic: (P x L x T) / 6000
     volumetric_weight = 0
     if payload.length and payload.width and payload.height:
         volumetric_weight = (payload.length * payload.width * payload.height) / 6000 * 1000 # convert to gram
-    
+
     effective_weight = max(payload.weight, volumetric_weight)
-    
-    # Scale-up: Real Raja Ongkir Integration
+
+    # Scale-up: Real Raja Ongkir Integration (domestic couriers only)
     rajaongkir_key = os.getenv("RAJA_ONGKIR_API_KEY")
     results = []
-    
-    if rajaongkir_key and rajaongkir_key != "your_raja_ongkir_key_here":
+    notice = None
+
+    provider_ready = (
+        bool(rajaongkir_key)
+        and rajaongkir_key != "your_raja_ongkir_key_here"
+        and bool(origin.rajaongkir_id)
+        and bool(destination.rajaongkir_id)
+        and not _is_international(courier.code)
+    )
+    if not origin.rajaongkir_id or not destination.rajaongkir_id:
+        notice = "RajaOngkir ID belum tersedia untuk salah satu kota; memakai estimasi internal."
+
+    if provider_ready:
         try:
             async with httpx.AsyncClient() as client:
                 resp = await client.post(
@@ -182,7 +239,7 @@ async def calculate_cost(
                     },
                     timeout=5.0
                 )
-                
+
                 if resp.status_code == 200:
                     data = resp.json()
                     raja_results = data.get("data", [])
@@ -198,15 +255,9 @@ async def calculate_cost(
             pass
 
     if not results:
-        # Fallback Logic (Dummy calculation if API fails or no key)
-        weight_kg = effective_weight / 1000
-        base_price = 12000 + (len(origin.name) * 100)
-        results = [
-            {"service": "REG", "description": "Reguler Service", "cost": int(base_price * weight_kg), "etd": "2-3 Days", "source": "internal_fallback"},
-            {"service": "EXP", "description": "Express Service", "cost": int(base_price * 1.5 * weight_kg), "etd": "1 Day", "source": "internal_fallback"}
-        ]
-    
-    return {
+        results = _fallback_services(courier, effective_weight / 1000)
+
+    response_body = {
         "origin": origin.name,
         "destination": destination.name,
         "courier": courier.name,
@@ -216,6 +267,9 @@ async def calculate_cost(
         "results": results,
         "currency": "IDR"
     }
+    if notice:
+        response_body["notice"] = notice
+    return response_body
 
 @router.post("/shipments", summary="Generate AWB (Waybill)")
 @limiter.limit("10/minute")
@@ -281,6 +335,72 @@ def create_shipment(
         "shipping_cost": shipping_cost,
         "etd": "2-3 Days"
     }
+
+
+@router.post("/shipments/batch", summary="Generate AWB (Batch, up to 100)")
+@limiter.limit("5/minute")
+def create_shipments_batch(
+    request: Request,
+    payload: List[schemas.ShipmentCreate],
+    db: Session = Depends(get_db),
+    api_key=Depends(validate_api_key)
+):
+    """
+    Create up to 100 shipments in a single call. Designed for ERP batch sync (e.g. Odoo)
+    and load testing with 10/50/100 waybills per request.
+    """
+    if not payload:
+        raise HTTPException(status_code=400, detail="Payload must contain at least one shipment")
+    if len(payload) > 100:
+        raise HTTPException(status_code=400, detail="Batch size exceeds the 100 shipment limit")
+
+    created = []
+    try:
+        for item in payload:
+            random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            awb = f"SS-{item.service_type}-{random_str}"
+
+            effective_weight = item.weight_gram
+            if item.length_cm and item.width_cm and item.height_cm:
+                volumetric = (item.length_cm * item.width_cm * item.height_cm) / 6000 * 1000
+                effective_weight = max(item.weight_gram, volumetric)
+            shipping_cost = (effective_weight / 1000) * DOMESTIC_BASE_PRICE_IDR
+
+            db.add(models.Tracking(
+                awb=awb,
+                courier_id=item.courier_id,
+                status="MANIFESTED",
+                origin_city_id=item.origin_city_id,
+                destination_city_id=item.destination_city_id,
+                service_type=item.service_type,
+                weight_gram=item.weight_gram,
+                length_cm=item.length_cm,
+                width_cm=item.width_cm,
+                height_cm=item.height_cm,
+                insurance_value=item.insurance_value,
+                shipping_cost=shipping_cost,
+                sender_name=item.sender_name,
+                sender_phone=item.sender_phone,
+                sender_address=item.sender_address,
+                sender_postal_code=item.sender_postal_code,
+                receiver_name=item.receiver_name,
+                receiver_phone=item.receiver_phone,
+                receiver_address=item.receiver_address,
+                receiver_postal_code=item.receiver_postal_code,
+                history=[{
+                    "status": "MANIFESTED",
+                    "location": "Origin Warehouse",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "note": "Batch manifest",
+                }],
+            ))
+            created.append({"awb": awb, "shipping_cost": shipping_cost, "etd": "2-3 Days"})
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Gagal membuat batch shipment: {str(e)}")
+
+    return {"status": "success", "count": len(created), "shipments": created}
 
 
 @router.get("/tracking/{awb}", response_model=schemas.TrackingInfo, summary="Lacak Paket (Tracking)", description="Melacak status terkini dan histori perjalanan paket berdasarkan nomor resi (AWB) secara real-time.")
