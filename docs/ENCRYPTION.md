@@ -152,6 +152,21 @@ Never commit `keys/` — it is ignored by `.gitignore`.
 - For batches, use `POST /v1/shipments/batch` with up to 100 shipments per call.
 - Treat any 400 from the decryption layer as non-retryable: the payload or key is wrong.
 
+## Measured on the reference deployment
+
+Render free instance (0.1 CPU), Singapore region, `X-Server-Decrypt-Ms` as reported by the server:
+
+| Request | Payload | Decrypt time |
+|---|---|---|
+| `POST /v1/cost` with RSA-AES | 65 B | ~1.9 ms |
+| `POST /v1/cost` with ECC-AES | 65 B | ~0.5 ms |
+| `POST /v1/shipments/batch` with 10 shipments | 3.5 KB | ~4.6 ms |
+| `POST /v1/shipments/batch` with 100 shipments | 34.7 KB | ~1.3 ms |
+
+ECC-AES is consistently faster because the client sends a 65-byte ephemeral point instead of a
+256-byte RSA-wrapped key. Numbers are indicative: the free instance shares CPU, so repeated runs
+vary by a few milliseconds.
+
 ## Limits and caveats
 
 - Nonces are not tracked server-side, so replay protection belongs to the client/TLS layer.
